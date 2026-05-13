@@ -1,0 +1,64 @@
+ticker,source_page,depth,status,status_code,html_bytes,error
+SBER,https://www.sberbank.com/investor-relations/groupresults,0,ok:200,200.0,369441,
+SBER,https://www.sberbank.com/index,1,ok:200,200.0,746483,
+SBER,https://www.sberbank.com/investor-relations/retail-shareholder-information/registrar,1,ok:200,200.0,275482,
+SBER,https://www.sberbank.com/investor-relations/contactsforinvestors,1,ok:200,200.0,1656,
+SBER,https://www.sberbank.com/ru/investor-relations/ras_vklad,1,ok:200,200.0,1656,
+SBER,https://www.sberbank.com/ru/investor-relations/groupresults,1,ok:200,200.0,1656,
+SBER,https://www.sberbank.com/investor-relations/groupresults/rpbu,2,ok:200,200.0,1656,
+SBER,https://www.sberbank.com/investor-relations/groupresults/msfo,2,ok:200,200.0,1656,
+SBER,https://www.sberbank.com/investor-relations/corporate-governance/annual-meeting-2026,2,ok:200,200.0,1656,
+SBER,https://www.sberbank.com/investor-relations/corporate-governance,2,ok:200,200.0,1656,
+GAZP,https://www.gazprom.com/investors/disclosure/reports/,0,failed,,0,"Unexpected error in _crawl_web at line 778 in _crawl_web (..\..\AppData\Roaming\Python\Python312\site-packages\crawl4ai\async_crawler_strategy.py):
+Error: Failed on navigating ACS-GOTO:
+Page.goto: net::ERR_TIMED_OUT at https://www.gazprom.com/investors/disclosure/reports/
+Call log:
+  - navigating to ""https://www.gazprom.com/investors/disclosure/reports/"", waiting until ""domcontentloaded""
+
+
+Code context:
+ 773                                   tag=""GOTO"",
+ 774                                   params={""url"": url},
+ 775                               )
+ 776                               response = None
+ 777                           else:
+ 778 →                             raise RuntimeError(f""Failed on navigating ACS-GOTO:\n{str(e)}"")
+ 779   
+ 780                       # ──────────────────────────────────────────────────────────────
+ 781                       # Walk the redirect chain.  Playwright returns only the last
+ 782                       # hop, so we trace the `request.redirected_from` links until the
+ 783                       # first response that differs from the final one and surface its"
+TATN,https://www.tatneft.ru/en/shareholders-and-investors/disclosure-of-information/financial-statements,0,failed,,0,"Unexpected error in _crawl_web at line 778 in _crawl_web (..\..\AppData\Roaming\Python\Python312\site-packages\crawl4ai\async_crawler_strategy.py):
+Error: Failed on navigating ACS-GOTO:
+Page.goto: net::ERR_TIMED_OUT at https://www.tatneft.ru/en/shareholders-and-investors/disclosure-of-information/financial-statements
+Call log:
+  - navigating to ""https://www.tatneft.ru/en/shareholders-and-investors/disclosure-of-information/financial-statements"", waiting until ""domcontentloaded""
+
+
+Code context:
+ 773                                   tag=""GOTO"",
+ 774                                   params={""url"": url},
+ 775                               )
+ 776                               response = None
+ 777                           else:
+ 778 →                             raise RuntimeError(f""Failed on navigating ACS-GOTO:\n{str(e)}"")
+ 779   
+ 780                       # ──────────────────────────────────────────────────────────────
+ 781                       # Walk the redirect chain.  Playwright returns only the last
+ 782                       # hop, so we trace the `request.redirected_from` links until the
+ 783                       # first response that differs from the final one and surface its"
+CHMF,https://www.severstal.com/eng/ir/results-and-reports/financial-results/,0,ok:301,301.0,119352,
+CHMF,https://severstal.com/rus/ir/results-and-reports/financial-results/,1,ok:404,404.0,121222,
+CHMF,https://www.severstal.com/rus/ir/results-and-reports/financial-results/,1,ok:301,301.0,121222,
+CHMF,https://severstal.com/eng/ir/results-and-reports/financial-results/,2,ok:404,404.0,118127,
+MGNT,https://www.magnit.com/ru/shareholders-and-investors/results-and-reports/financial-results/,0,ok:404,404.0,64502,
+MGNT,https://www.magnit.com/ru/disclosure/internal-regulations/,1,ok:200,200.0,131554,
+MGNT,https://magnit.com/en/shareholders-and-investors/results-and-reports/financial-results/,1,ok:301,301.0,52994,
+MGNT,https://www.magnit.com/ru/shareholders-and-investors/key-figures/,1,ok:200,200.0,66517,
+MGNT,https://www.magnit.com/ru/shareholders-and-investors/presentations/,1,ok:200,200.0,72965,
+MGNT,https://magnit.com/en/disclosure/internal-regulations/,2,ok:301,301.0,72010,
+MGNT,https://www.magnit.com/ru/disclosure/,2,ok:302,302.0,131585,
+MGNT,https://www.magnit.com/ru/disclosure/regulatory-news/,2,ok:200,200.0,2775100,
+MGNT,https://www.magnit.com/en/disclosure/internal-regulations/,2,ok:200,200.0,72010,
+MGNT,https://magnit.com/ru/shareholders-and-investors/results-and-reports/financial-results/,2,ok:301,301.0,64579,
+AFLT,https://ir.aeroflot.ru/financial-results-and-presentations/financial-statements/,0,ok:404,404.0,26356,

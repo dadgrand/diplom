@@ -1,0 +1,398 @@
+{
+  "n_train": 379,
+  "n_validation": 161,
+  "n_test": 169,
+  "class_distribution": {
+    "low": 169,
+    "medium": 196,
+    "high": 344
+  },
+  "target_thresholds": {
+    "low_upper": 0.7704485488126649,
+    "medium_upper": 0.8255936675461741
+  },
+  "added_features_count": 34,
+  "added_features": [
+    "downside_to_total_vol",
+    "liquidity_stress",
+    "liquidity_vol_interaction",
+    "beta_vol_interaction",
+    "macro_pressure",
+    "rate_fx_pressure",
+    "curve_inversion_flag",
+    "debt_service_stress",
+    "cashflow_buffer",
+    "size_liquidity_interaction",
+    "momentum_reversal_risk",
+    "fundamental_fragility",
+    "log_market_cap_cs_rank",
+    "log_market_cap_sector_z",
+    "beta_60d_cs_rank",
+    "beta_60d_sector_z",
+    "rolling_vol_20d_cs_rank",
+    "rolling_vol_20d_sector_z",
+    "downside_vol_60d_cs_rank",
+    "downside_vol_60d_sector_z",
+    "amihud_20d_cs_rank",
+    "amihud_20d_sector_z",
+    "avg_daily_traded_value_20d_cs_rank",
+    "avg_daily_traded_value_20d_sector_z",
+    "spread_proxy_cs_rank",
+    "spread_proxy_sector_z",
+    "turnover_ratio_cs_rank",
+    "turnover_ratio_sector_z",
+    "net_debt_to_ebitda_cs_rank",
+    "net_debt_to_ebitda_sector_z",
+    "interest_coverage_cs_rank",
+    "interest_coverage_sector_z",
+    "free_cash_flow_cs_rank",
+    "free_cash_flow_sector_z"
+  ],
+  "split_check": {
+    "check": "temporal_split_order",
+    "passed": true,
+    "train_max": "2024-08-31 00:00:00",
+    "validation_min": "2024-09-30 00:00:00",
+    "validation_max": "2025-02-28 00:00:00",
+    "test_min": "2025-03-31 00:00:00"
+  },
+  "data_quality": [
+    {
+      "check": "no_duplicate_keys",
+      "keys": [
+        "decision_date",
+        "ticker"
+      ],
+      "passed": true,
+      "duplicates": 0.0,
+      "non_null_rates": NaN,
+      "min_date": NaN,
+      "max_date": NaN
+    },
+    {
+      "check": "target_components_available",
+      "keys": NaN,
+      "passed": true,
+      "duplicates": NaN,
+      "non_null_rates": {
+        "future_max_drawdown": 1.0,
+        "future_downside_volatility": 1.0,
+        "future_cvar_95": 1.0,
+        "future_illiquidity": 1.0
+      },
+      "min_date": NaN,
+      "max_date": NaN
+    },
+    {
+      "check": "date_parse",
+      "keys": NaN,
+      "passed": true,
+      "duplicates": NaN,
+      "non_null_rates": NaN,
+      "min_date": "2023-07-31 00:00:00",
+      "max_date": "2025-08-31 00:00:00"
+    }
+  ],
+  "validation_selected_overlay_sectors": [],
+  "autoencoder_backend": "torch_autoencoder",
+  "autoencoder_reconstruction_loss": 1.1187375783920288,
+  "architectures": {
+    "baseline_rf": {
+      "validation": {
+        "macro_f1": 0.4907893689822551,
+        "weighted_f1": 0.5923696193372467,
+        "balanced_accuracy": 0.5163001249957772,
+        "high_recall": 0.7272727272727273,
+        "high_precision": 0.7741935483870968,
+        "high_false_negative_rate": 0.2727272727272727,
+        "ordinal_adjacent_accuracy": 0.906832298136646
+      },
+      "test": {
+        "macro_f1": 0.36482231219073324,
+        "weighted_f1": 0.5734214918269729,
+        "balanced_accuracy": 0.4212000589709568,
+        "high_recall": 0.7899159663865546,
+        "high_precision": 0.734375,
+        "high_false_negative_rate": 0.21008403361344538,
+        "ordinal_adjacent_accuracy": 0.8284023668639053
+      },
+      "validation_probability": {
+        "mean_confidence": 0.5365821316449614,
+        "ece_10_bins": 0.05442132879838789,
+        "mean_high_probability": 0.4457763652026561
+      },
+      "test_probability": {
+        "mean_confidence": 0.5906877530500977,
+        "ece_10_bins": 0.07026374908140981,
+        "mean_high_probability": 0.5291892353633669
+      },
+      "ensemble_weights": {
+        "rf": 0.1,
+        "extra": 0.9,
+        "gb": 0.0
+      },
+      "calibration_gamma": 1.8,
+      "policy_thresholds": {
+        "low": 0.3500000000000001,
+        "high": 0.42500000000000016
+      }
+    },
+    "regime_only": {
+      "validation": {
+        "macro_f1": 0.4033178588662041,
+        "weighted_f1": 0.5374679398040851,
+        "balanced_accuracy": 0.46139207008772226,
+        "high_recall": 0.7676767676767676,
+        "high_precision": 0.7450980392156863,
+        "high_false_negative_rate": 0.23232323232323232,
+        "ordinal_adjacent_accuracy": 0.8633540372670807
+      },
+      "test": {
+        "macro_f1": 0.35262515262515265,
+        "weighted_f1": 0.5589266749030063,
+        "balanced_accuracy": 0.4366799351319475,
+        "high_recall": 0.7310924369747899,
+        "high_precision": 0.7565217391304347,
+        "high_false_negative_rate": 0.2689075630252101,
+        "ordinal_adjacent_accuracy": 0.7810650887573964
+      },
+      "validation_probability": {
+        "mean_confidence": 0.5456595863163934,
+        "ece_10_bins": 0.04414640861477761,
+        "mean_high_probability": 0.464083975014108
+      },
+      "test_probability": {
+        "mean_confidence": 0.573280446523386,
+        "ece_10_bins": 0.08043194359653978,
+        "mean_high_probability": 0.4954446624312859
+      },
+      "ensemble_weights": {
+        "rf": 0.1,
+        "extra": 0.8,
+        "gb": 0.1
+      },
+      "calibration_gamma": 1.8,
+      "policy_thresholds": {
+        "low": 0.32500000000000007,
+        "high": 0.42500000000000016
+      }
+    },
+    "enriched_reference": {
+      "validation": {
+        "macro_f1": 0.4814109399121486,
+        "weighted_f1": 0.6063883564146325,
+        "balanced_accuracy": 0.5346666216231434,
+        "high_recall": 0.797979797979798,
+        "high_precision": 0.797979797979798,
+        "high_false_negative_rate": 0.20202020202020202,
+        "ordinal_adjacent_accuracy": 0.8633540372670807
+      },
+      "test": {
+        "macro_f1": 0.45544871794871794,
+        "weighted_f1": 0.6453060992262175,
+        "balanced_accuracy": 0.5503179200372849,
+        "high_recall": 0.7647058823529411,
+        "high_precision": 0.8666666666666667,
+        "high_false_negative_rate": 0.23529411764705882,
+        "ordinal_adjacent_accuracy": 0.8402366863905325
+      },
+      "validation_probability": {
+        "mean_confidence": 0.5449341899261029,
+        "ece_10_bins": 0.09491527124340295,
+        "mean_high_probability": 0.40585092264001554
+      },
+      "test_probability": {
+        "mean_confidence": 0.5665489817895394,
+        "ece_10_bins": 0.04707692781146489,
+        "mean_high_probability": 0.4218087446112312
+      },
+      "ensemble_weights": {
+        "rf": 0.0,
+        "extra": 0.30000000000000004,
+        "gb": 0.7000000000000001
+      },
+      "calibration_gamma": 1.25,
+      "policy_thresholds": {
+        "low": 0.4500000000000002,
+        "high": 0.30000000000000004
+      }
+    },
+    "ann_plus_regime": {
+      "validation": {
+        "macro_f1": 0.4687753379161912,
+        "weighted_f1": 0.5906113183463613,
+        "balanced_accuracy": 0.49042262085740346,
+        "high_recall": 0.7878787878787878,
+        "high_precision": 0.75,
+        "high_false_negative_rate": 0.21212121212121213,
+        "ordinal_adjacent_accuracy": 0.8695652173913043
+      },
+      "test": {
+        "macro_f1": 0.4490393983680429,
+        "weighted_f1": 0.6265237443060578,
+        "balanced_accuracy": 0.5079872356412853,
+        "high_recall": 0.7310924369747899,
+        "high_precision": 0.8285714285714286,
+        "high_false_negative_rate": 0.2689075630252101,
+        "ordinal_adjacent_accuracy": 0.8284023668639053
+      },
+      "validation_probability": {
+        "mean_confidence": 0.5149018099024371,
+        "ece_10_bins": 0.054656197523763335,
+        "mean_high_probability": 0.398685265889868
+      },
+      "test_probability": {
+        "mean_confidence": 0.529779504277078,
+        "ece_10_bins": 0.07315692473137993,
+        "mean_high_probability": 0.4061195738313975
+      },
+      "ensemble_weights": {
+        "rf": 0.1,
+        "extra": 0.8,
+        "gb": 0.1
+      },
+      "calibration_gamma": 1.25,
+      "policy_thresholds": {
+        "low": 0.42500000000000016,
+        "high": 0.30000000000000004
+      }
+    }
+  },
+  "test": {
+    "baseline_rf": {
+      "macro_f1": 0.36482231219073324,
+      "weighted_f1": 0.5734214918269729,
+      "balanced_accuracy": 0.4212000589709568,
+      "high_recall": 0.7899159663865546,
+      "high_precision": 0.734375,
+      "high_false_negative_rate": 0.21008403361344538,
+      "ordinal_adjacent_accuracy": 0.8284023668639053
+    },
+    "regime_only": {
+      "macro_f1": 0.35262515262515265,
+      "weighted_f1": 0.5589266749030063,
+      "balanced_accuracy": 0.4366799351319475,
+      "high_recall": 0.7310924369747899,
+      "high_precision": 0.7565217391304347,
+      "high_false_negative_rate": 0.2689075630252101,
+      "ordinal_adjacent_accuracy": 0.7810650887573964
+    },
+    "ann_plus_regime": {
+      "macro_f1": 0.4490393983680429,
+      "weighted_f1": 0.6265237443060578,
+      "balanced_accuracy": 0.5079872356412853,
+      "high_recall": 0.7310924369747899,
+      "high_precision": 0.8285714285714286,
+      "high_false_negative_rate": 0.2689075630252101,
+      "ordinal_adjacent_accuracy": 0.8284023668639053
+    },
+    "enriched_reference": {
+      "macro_f1": 0.45544871794871794,
+      "weighted_f1": 0.6453060992262175,
+      "balanced_accuracy": 0.5503179200372849,
+      "high_recall": 0.7647058823529411,
+      "high_precision": 0.8666666666666667,
+      "high_false_negative_rate": 0.23529411764705882,
+      "ordinal_adjacent_accuracy": 0.8402366863905325
+    },
+    "sector_overlay": {
+      "macro_f1": 0.45544871794871794,
+      "weighted_f1": 0.6453060992262175,
+      "balanced_accuracy": 0.5503179200372849,
+      "high_recall": 0.7647058823529411,
+      "high_precision": 0.8666666666666667,
+      "high_false_negative_rate": 0.23529411764705882,
+      "ordinal_adjacent_accuracy": 0.8402366863905325
+    }
+  },
+  "sector_overlay_probability": {
+    "mean_confidence": 0.5665489817895394,
+    "ece_10_bins": 0.04707692781146489,
+    "mean_high_probability": 0.4218087446112312
+  },
+  "confusion_sector_overlay": {
+    "pred_low": {
+      "actual_low": 15,
+      "actual_medium": 17,
+      "actual_high": 24
+    },
+    "pred_medium": {
+      "actual_low": 1,
+      "actual_medium": 3,
+      "actual_high": 4
+    },
+    "pred_high": {
+      "actual_low": 3,
+      "actual_medium": 11,
+      "actual_high": 91
+    }
+  },
+  "classwise_sector_overlay": [
+    {
+      "class": "low",
+      "precision": 0.26785714285714285,
+      "recall": 0.7894736842105263,
+      "f1": 0.4,
+      "support": 19
+    },
+    {
+      "class": "medium",
+      "precision": 0.375,
+      "recall": 0.0967741935483871,
+      "f1": 0.15384615384615385,
+      "support": 31
+    },
+    {
+      "class": "high",
+      "precision": 0.8666666666666667,
+      "recall": 0.7647058823529411,
+      "f1": 0.8125,
+      "support": 119
+    }
+  ],
+  "economic_monotonicity": [
+    {
+      "predicted_class": "low",
+      "future_max_drawdown": 0.002810442746004814,
+      "future_downside_volatility": 0.0012711035358920861,
+      "future_cvar_95": 0.0012980660862611365,
+      "future_illiquidity": 3.1419932637148655e-11,
+      "class_order": 0,
+      "future_max_drawdown_is_monotone": true,
+      "future_downside_volatility_is_monotone": true,
+      "future_cvar_95_is_monotone": false,
+      "future_illiquidity_is_monotone": false
+    },
+    {
+      "predicted_class": "medium",
+      "future_max_drawdown": 0.007125427205245807,
+      "future_downside_volatility": 0.0013162319942194925,
+      "future_cvar_95": 0.0011875942212562804,
+      "future_illiquidity": 2.2762668177208036e-11,
+      "class_order": 1,
+      "future_max_drawdown_is_monotone": true,
+      "future_downside_volatility_is_monotone": true,
+      "future_cvar_95_is_monotone": false,
+      "future_illiquidity_is_monotone": false
+    },
+    {
+      "predicted_class": "high",
+      "future_max_drawdown": 0.01904617043833947,
+      "future_downside_volatility": 0.003549319504223796,
+      "future_cvar_95": 0.0059638059456903975,
+      "future_illiquidity": 5.552674293678075e-11,
+      "class_order": 2,
+      "future_max_drawdown_is_monotone": true,
+      "future_downside_volatility_is_monotone": true,
+      "future_cvar_95_is_monotone": false,
+      "future_illiquidity_is_monotone": false
+    }
+  ],
+  "walk_forward": {
+    "folds": 4,
+    "macro_f1_mean": 0.4424979758713913,
+    "macro_f1_std": 0.052034247016461,
+    "high_recall_mean": 0.8064498546511628
+  },
+  "drift_warning_count": 24
+}

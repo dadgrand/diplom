@@ -1,0 +1,9 @@
+ticker,source_page,depth,status,content_type,bytes,error
+SBER,https://www.sberbank.com/investor-relations/groupresults,0,ok:200,"text/html; charset=utf-8, text/html",1579,
+GAZP,https://www.gazprom.com/investors/disclosure/reports/,0,failed,,0,"HTTPSConnectionPool(host='www.gazprom.com', port=443): Read timed out. (read timeout=35)"
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/FinancialReports,0,ok:200,text/html; charset=utf-8,138958,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter,1,ok:200,text/html; charset=utf-8,253132,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/AnalystCoverage,1,ok:200,text/html; charset=utf-8,72089,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/IrTool,1,ok:200,text/html; charset=utf-8,67777,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/Contacts,1,ok:200,text/html; charset=utf-8,71119,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/ShareholdersMeeting,1,ok:200,text/html; charset=utf-8,145013,

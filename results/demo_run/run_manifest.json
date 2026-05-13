@@ -1,0 +1,214 @@
+{
+  "python": "3.13.5",
+  "platform": "Linux-4.4.0-x86_64-with-glibc2.41",
+  "input_rows": 709,
+  "input_columns": [
+    "decision_date",
+    "ticker",
+    "sector",
+    "log_market_cap",
+    "book_to_market",
+    "beta_60d",
+    "rolling_vol_20d",
+    "downside_vol_60d",
+    "momentum_6m",
+    "amihud_20d",
+    "avg_daily_traded_value_20d",
+    "spread_proxy",
+    "turnover_ratio",
+    "cbr_key_rate",
+    "usd_rub",
+    "ofz_slope_10y_2y",
+    "imoex_realized_vol_20d",
+    "average_market_correlation_60d",
+    "net_debt_to_ebitda",
+    "interest_coverage",
+    "operating_cash_flow",
+    "free_cash_flow",
+    "ebitda_margin",
+    "net_debt_to_ebitda_missing",
+    "interest_coverage_missing",
+    "cash_flow_missing",
+    "future_max_drawdown",
+    "future_downside_volatility",
+    "future_cvar_95",
+    "future_illiquidity"
+  ],
+  "input_fingerprint": "d47b3cf57fb657eb73f0b83cf0e639a272aca0276d032164f703817e15d2df72",
+  "config": {
+    "random_state": 42,
+    "artifact_dir": "results/run",
+    "split": {
+      "train_start": "2023-07-01",
+      "train_end": "2024-08-31",
+      "validation_start": "2024-09-01",
+      "validation_end": "2025-02-28",
+      "test_start": "2025-03-01",
+      "test_end": "2025-08-31"
+    },
+    "target": {
+      "horizon_days": 126,
+      "weights": {
+        "future_max_drawdown": 0.35,
+        "future_downside_volatility": 0.3,
+        "future_cvar_95": 0.2,
+        "future_illiquidity": 0.15
+      }
+    },
+    "features": {
+      "categorical": [
+        "sector",
+        "regime_cluster"
+      ],
+      "regime": [
+        "cbr_key_rate",
+        "usd_rub",
+        "ofz_slope_10y_2y",
+        "imoex_realized_vol_20d",
+        "average_market_correlation_60d"
+      ],
+      "model_v1": [
+        "log_market_cap",
+        "book_to_market",
+        "beta_60d",
+        "rolling_vol_20d",
+        "downside_vol_60d",
+        "momentum_6m",
+        "amihud_20d",
+        "avg_daily_traded_value_20d",
+        "spread_proxy",
+        "turnover_ratio",
+        "cbr_key_rate",
+        "usd_rub",
+        "ofz_slope_10y_2y",
+        "imoex_realized_vol_20d",
+        "average_market_correlation_60d"
+      ],
+      "model_v2_extra": [
+        "net_debt_to_ebitda",
+        "interest_coverage",
+        "operating_cash_flow",
+        "free_cash_flow",
+        "ebitda_margin",
+        "net_debt_to_ebitda_missing",
+        "interest_coverage_missing",
+        "cash_flow_missing"
+      ],
+      "enable_derived_features": true,
+      "cross_sectional_rank_features": [
+        "log_market_cap",
+        "beta_60d",
+        "rolling_vol_20d",
+        "downside_vol_60d",
+        "amihud_20d",
+        "avg_daily_traded_value_20d",
+        "spread_proxy",
+        "turnover_ratio",
+        "net_debt_to_ebitda",
+        "interest_coverage",
+        "free_cash_flow"
+      ],
+      "derived_features": [
+        "downside_to_total_vol",
+        "liquidity_stress",
+        "liquidity_vol_interaction",
+        "beta_vol_interaction",
+        "macro_pressure",
+        "rate_fx_pressure",
+        "curve_inversion_flag",
+        "debt_service_stress",
+        "cashflow_buffer",
+        "size_liquidity_interaction",
+        "momentum_reversal_risk",
+        "fundamental_fragility"
+      ]
+    },
+    "model": {
+      "n_estimators": 25,
+      "min_samples_leaf": 4,
+      "class_weight": "balanced_subsample",
+      "regime_k": 2,
+      "autoencoder_latent_dim": 3,
+      "autoencoder_hidden_dim": 8,
+      "autoencoder_epochs": 8,
+      "overlay_min_sector_rows": 18,
+      "overlay_min_gain": 0.1,
+      "candidates": [
+        "rf",
+        "extra",
+        "gb"
+      ],
+      "ensemble_weight_step": 0.1,
+      "calibration_grid": [
+        0.65,
+        0.8,
+        1.0,
+        1.25,
+        1.5,
+        1.8
+      ],
+      "high_recall_bonus": 0.02,
+      "n_jobs": 1,
+      "random_state": 42
+    },
+    "walk_forward": {
+      "initial_months": 12,
+      "validation_months": 3,
+      "test_months": 3,
+      "step_months": 3
+    },
+    "diagnostics": {
+      "psi_bins": 10,
+      "drift_psi_warn": 0.2,
+      "run_data_quality_checks": true,
+      "save_model_package": true
+    }
+  },
+  "artifact_files": [
+    {
+      "path": "results/demo_run/metrics.json",
+      "sha256": "8a193d5d1da4c13c1fe43320db5a6400e33ebe2468eec9af24ae868c8eda8bb8",
+      "bytes": 12399
+    },
+    {
+      "path": "results/demo_run/predictions.csv",
+      "sha256": "d9c617ab5fae18b1333944e720cb20a33a9c6381f87869f973abf8266bb5b7cf",
+      "bytes": 29970
+    },
+    {
+      "path": "results/demo_run/feature_importance.csv",
+      "sha256": "860a5689f367c2f85f5f8d9d913b6ec0e5e5290a1c07e01bb965889b5fef35b0",
+      "bytes": 9350
+    },
+    {
+      "path": "results/demo_run/data_quality_report.csv",
+      "sha256": "0a5127aec5d7341e0908a2a957904e28952ef16d92e93de4df15f2b3a1c9b51a",
+      "bytes": 334
+    },
+    {
+      "path": "results/demo_run/feature_drift_report.csv",
+      "sha256": "10263f285920eaba16223d9acbc5c21360bdd65b7e57f6b158e802e7601e2cd8",
+      "bytes": 12625
+    },
+    {
+      "path": "results/demo_run/walk_forward_report.csv",
+      "sha256": "66151902b8b1641836f3f9fb8e69c8263560097c3ac32647166d53cec8b1862c",
+      "bytes": 636
+    },
+    {
+      "path": "results/demo_run/model_leaderboard.csv",
+      "sha256": "876bd8c4a55b9e0060a3841083017d941cdb2ee27874843b45fd7726372bb323",
+      "bytes": 970
+    },
+    {
+      "path": "results/demo_run/RUN_REPORT.md",
+      "sha256": "e51aac49683e62ebc51462e4c782a6f7c31a2749fd0cbaf8b87a0bc785231081",
+      "bytes": 754
+    },
+    {
+      "path": "results/demo_run/model_package.joblib",
+      "sha256": "1472c2912fd6275022019acbc0bc7ad4511e6d018c291e6f08260b8a8fb0abbe",
+      "bytes": 554410
+    }
+  ]
+}

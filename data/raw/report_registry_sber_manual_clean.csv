@@ -1,0 +1,12 @@
+ticker,company_name,report_period_end,publish_date,report_type,accounting_standard,language,source_name,source_url,local_path,download_status,content_type,detected_extension,file_sha256,bytes,pages
+SBER,??? ????????,2022-12-31,2023-03-08,ifrs_fy,IFRS,en,manual_sber,,SBER\2022_ifrs_en.pdf,manual,application/pdf,.pdf,9f364dda0e2c440aa28fd230a160cd7dd349506d54cb0765367779c99c6e5cdf,3258015,9
+SBER,??? ????????,2023-12-31,2024-02-28,ifrs_fy,IFRS,en,manual_sber,,SBER\2023__ifrs__en.pdf,manual,application/pdf,.pdf,af9f19ddfd174a6bd90c8a5259f1b952b846062d0cb4bbe17ddda652709612b7,4287977,10
+SBER,??? ????????,2023-06-30,2023-08-03,ifrs_h1,IFRS,en,manual_sber,,SBER\2023__q2_ifrs_en.pdf,manual,application/pdf,.pdf,0ede5dbc502092284ca4455045e09de1531f7b740d8914615d53e9ff99c2abc6,3714852,10
+SBER,??? ????????,2023-03-31,2023-07-04,ifrs_q1,IFRS,en,manual_sber,,SBER\2023_q1_ifrs_en.pdf,manual,application/pdf,.pdf,58983c431d1224f43c0046c49a5bfe080d0e0fc82b7baa56d3e3c83caf36928d,2742712,9
+SBER,??? ????????,2023-09-30,2023-11-02,ifrs_9m,IFRS,en,manual_sber,,SBER\2023_q3_ifrs__en.pdf,manual,application/pdf,.pdf,455d3689d75713c637348afa54c2356b711c7fc30d501a310fab30724eb092a9,3322673,10
+SBER,??? ????????,2024-03-31,2024-04-25,ifrs_q1,IFRS,en,manual_sber,,SBER\2024_q1_ipfu6byaz_en.pdf,manual,application/pdf,.pdf,a253733219105c3339ed232f06b1b77be9aaaca5e606d32bcaf3158a3d1a649d,3031524,10
+SBER,??? ????????,2024-06-30,2024-08-08,ifrs_h1,IFRS,en,manual_sber,,SBER\2024_q2_so6rfkcg_en.pdf,manual,application/pdf,.pdf,756f0ad9db059e0594593f48977d74bf3e9fa6b32e8f302a06eb547dc472bfc7,4132850,10
+SBER,??? ????????,2025-06-30,2025-07-29,ifrs_h1,IFRS,en,manual_sber,,SBER\2025ifrs_results_q2_v3jjxfgl_en.pdf,manual,application/pdf,.pdf,ecaea58a28c4443def03b354a0b1b77ed3ef6784794fcaffce345e341ff1fb4b,3087139,9
+SBER,??? ????????,2025-03-31,2025-04-28,ifrs_q1,IFRS,en,manual_sber,,SBER\q1_9xbiec5w_2025year_results_ifrs_en.pdf,manual,application/pdf,.pdf,5ca7759286d66066cc1caae5d703b7c2a1c54ea5dcde86fe6972eff66c4a2bbd,2812909,9
+SBER,??? ????????,2024-09-30,2024-10-31,ifrs_9m,IFRS,en,manual_sber,,SBER\q3_2024_z7d08uov_en.pdf,manual,application/pdf,.pdf,a81ba06781e01f0e59326b73e61ff6e0cd409395f3934de71deb0cab3f2e21cb,3387337,9
+SBER,??? ????????,2024-12-31,2025-02-27,ifrs_fy,IFRS,en,manual_sber,,SBER\results_q4_6guwb92b_2024_en.pdf,manual,application/pdf,.pdf,50ac8237f1bdcc0a609ed6cc7cec96b4f05bcb217190ac1fcdb0559943d61be4,3154410,9

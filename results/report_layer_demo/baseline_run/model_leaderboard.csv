@@ -1,0 +1,17 @@
+architecture,candidate,validation_macro_f1_argmax
+baseline_v1,weighted_ensemble_calibrated_policy,0.4704129416773095
+baseline_v1,weighted_ensemble_argmax,0.4557035158176566
+baseline_v1,extra,0.42345679012345677
+baseline_v1,rf,0.4061866193872479
+regime_v1,weighted_ensemble_calibrated_policy,0.4567901234567901
+regime_v1,weighted_ensemble_argmax,0.4401515151515151
+regime_v1,extra,0.42049549549549553
+regime_v1,rf,0.3996913580246913
+enriched_v2,weighted_ensemble_calibrated_policy,0.4518518518518519
+enriched_v2,extra,0.43068043068043066
+enriched_v2,weighted_ensemble_argmax,0.43068043068043066
+enriched_v2,rf,0.3382066276803119
+ann_regime_v3,weighted_ensemble_calibrated_policy,0.452991452991453
+ann_regime_v3,weighted_ensemble_argmax,0.452991452991453
+ann_regime_v3,rf,0.44372294372294374
+ann_regime_v3,extra,0.4017094017094018

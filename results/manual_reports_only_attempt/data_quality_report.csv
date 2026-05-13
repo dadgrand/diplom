@@ -1,0 +1,3 @@
+check,passed,error,missing
+no_duplicate_keys,False,duplicate_key_check: missing required columns: ['decision_date'],
+target_components_available,False,,"['future_max_drawdown', 'future_downside_volatility', 'future_cvar_95', 'future_illiquidity']"

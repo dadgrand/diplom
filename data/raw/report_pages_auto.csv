@@ -1,0 +1,67 @@
+ticker,source_page,depth,status,content_type,bytes,error
+SBER,https://www.sberbank.com/investor-relations/groupresults,0,ok:200,"text/html; charset=utf-8, text/html",1579,
+GAZP,https://www.gazprom.com/investors/disclosure/reports/,0,failed,,0,"HTTPSConnectionPool(host='www.gazprom.com', port=443): Read timed out. (read timeout=35)"
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/FinancialReports,0,ok:200,text/html; charset=utf-8,138958,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter,1,ok:200,text/html; charset=utf-8,253132,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/AnalystCoverage,1,ok:200,text/html; charset=utf-8,72089,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/IrTool,1,ok:200,text/html; charset=utf-8,67777,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/Contacts,1,ok:200,text/html; charset=utf-8,71119,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/ShareholdersMeeting,1,ok:200,text/html; charset=utf-8,145013,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/ShareholderRelations,1,ok:200,text/html; charset=utf-8,78966,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/ShareholderRelations/Registrar,1,ok:200,text/html; charset=utf-8,71082,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/ShareholderRelations/FAQ,1,ok:200,text/html; charset=utf-8,391307,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/ir-releases,1,ok:200,text/html; charset=utf-8,277037,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/Securities/Dividends,1,ok:200,text/html; charset=utf-8,106543,
+LKOH,https://www.lukoil.com/InvestorAndShareholderCenter/Securities/sharecapital,1,ok:200,text/html; charset=utf-8,100584,
+ROSN,https://www.rosneft.com/Investors/statements_and_presentations/Financial_statements/,0,failed,,0,404 Client Error: Not Found for url: https://www.rosneft.com/Investors/statements_and_presentations/Financial_statements/
+NVTK,https://www.novatek.ru/en/investors/financial-results/,0,failed,,0,404 Client Error: Not Found for url: https://www.novatek.ru/en/investors/financial-results/
+GMKN,https://www.nornickel.com/investors/reports-and-results/annual-reports/,0,ok:200,text/html; charset=UTF-8,100328,
+MOEX,https://www.moex.com/s1355,0,ok:200,text/html; charset=utf-8,198153,
+MOEX,https://www.moex.com/en/exchange/investors.aspx,1,ok:200,text/html; charset=utf-8,159015,
+MOEX,https://www.moex.com/s782,1,ok:200,text/html; charset=utf-8,150239,
+MOEX,https://www.moex.com/s756,1,ok:200,text/html; charset=utf-8,174527,
+MOEX,https://www.moex.com/s1354,1,ok:200,text/html; charset=utf-8,169391,
+MOEX,https://www.moex.com/s1358,1,ok:200,text/html; charset=utf-8,153424,
+MOEX,https://fs.moex.com/files/24112,1,ok:200,text/html; charset=utf-8,118302,
+MOEX,https://fs.moex.com/files/23571,1,ok:200,text/html; charset=utf-8,118459,
+MOEX,https://fs.moex.com/files/23202,1,ok:200,text/html; charset=utf-8,118578,
+MOEX,https://fs.moex.com/files/22753,1,ok:200,text/html; charset=utf-8,118943,
+MOEX,https://fs.moex.com/files/22472,1,ok:200,text/html; charset=utf-8,118296,
+MOEX,https://fs.moex.com/files/21817,1,ok:200,text/html; charset=utf-8,118466,
+TATN,https://www.tatneft.ru/en/shareholders-and-investors/disclosure-of-information/financial-statements,0,failed,,0,"HTTPSConnectionPool(host='www.tatneft.ru', port=443): Read timed out. (read timeout=35)"
+VTBR,https://www.vtb.com/ir/statements/,0,failed,,0,404 Client Error: Not Found for url: https://www.vtb.com/ir/statements/
+CHMF,https://www.severstal.com/eng/ir/results-and-reports/financial-results/,0,failed,,0,502 Server Error: Bad Gateway for url: https://severstal.com/eng/ir/results-and-reports/financial-results/
+PLZL,https://polyus.com/en/investors/results-and-reports/,0,ok:200,text/html; charset=UTF-8,340114,
+PLZL,https://polyus.com/en/investors/results-and-reports/?lang=ru,1,ok:200,text/html; charset=UTF-8,292397,
+PLZL,https://sustainability.polyus.com/en/esg_data_and_reports/,1,ok:200,text/html; charset=UTF-8,514329,
+PLZL,https://polyus.com/en/investors/,1,ok:200,text/html; charset=UTF-8,33265,
+PLZL,https://polyus.com/en/investors/factsheet/,1,ok:200,text/html; charset=UTF-8,57463,
+PLZL,https://polyus.com/en/investors/disclosure/,1,ok:200,text/html; charset=UTF-8,26986,
+PLZL,https://polyus.com/en/investors/credit-ratings/,1,ok:200,text/html; charset=UTF-8,24538,
+PLZL,https://polyus.com/en/investors/presentations/,1,ok:200,text/html; charset=UTF-8,88881,
+PLZL,https://polyus.com/en/investors/shares/,1,ok:200,text/html; charset=UTF-8,26391,
+PLZL,https://polyus.com/en/investors/fixed-income/,1,ok:200,text/html; charset=UTF-8,26517,
+PLZL,https://polyus.com/en/investors/investor-calendar/,1,ok:200,text/html; charset=UTF-8,64732,
+PLZL,https://polyus.com/en/investors/capital-markets-day/,1,ok:200,text/html; charset=UTF-8,24203,
+MGNT,https://www.magnit.com/en/shareholders-and-investors/results-and-reports/financial-results/,0,failed,,0,404 Client Error: Not Found for url: https://www.magnit.com/en/shareholders-and-investors/results-and-reports/financial-results/
+ALRS,https://www.alrosa.ru/en/investors/results-and-reports/,0,failed,,0,404 Client Error: Not Found for url: https://www.alrosa.ru/en/investors/results-and-reports/
+AFLT,https://ir.aeroflot.ru/financial-results-and-presentations/financial-statements/,0,ok:200,text/html; charset=utf-8,3392,
+PHOR,https://www.phosagro.com/investors/reports/,0,ok:200,text/html; charset=UTF-8,158587,
+PHOR,https://ar2024.phosagro.com/,1,ok:200,text/html; charset=utf-8,160128,
+PHOR,http://ar2023.phosagro.com/,1,ok:200,text/html; charset=utf-8,129610,
+PHOR,https://ar2022.phosagro.com/,1,ok:200,text/html; charset=utf-8,1976568,
+PHOR,http://ar2021.phosagro.com/,1,failed,,0,"('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))"
+PHOR,https://ar2024.phosagro.com/company-profile,2,ok:200,text/html; charset=utf-8,84533,
+PHOR,https://ar2024.phosagro.com/company-profile/about-report,2,ok:200,text/html; charset=utf-8,89380,
+PHOR,https://ar2024.phosagro.com/company-profile/fertile-ground-for-partnership,2,ok:200,text/html; charset=utf-8,85892,
+PHOR,https://ar2024.phosagro.com/company-profile/mission-values,2,ok:200,text/html; charset=utf-8,82668,
+PHOR,https://ar2024.phosagro.com/company-profile/un-sdg-navigator,2,ok:200,text/html; charset=utf-8,94864,
+PHOR,https://ar2024.phosagro.com/company-profile/key-indicators,2,ok:200,text/html; charset=utf-8,89441,
+PHOR,https://ar2024.phosagro.com/company-profile/key-events,2,ok:200,text/html; charset=utf-8,89747,
+RUAL,https://rusal.ru/en/investors/financial_reports/,0,failed,,0,404 Client Error: Not Found for url: https://rusal.ru/en/investors/financial_reports/
+SNGS,https://www.surgutneftegas.ru/en/investors/reports/,0,failed,,0,404 Client Error: Not Found for url: https://www.surgutneftegas.ru/en/investors/reports/
+YNDX,https://ir.yandex/,0,ok:200,text/html; charset=utf-8,71423,
+YNDX,https://ir.yandex,1,ok:200,text/html; charset=utf-8,71423,
+YNDX,https://ir.yandex/financial-releases,1,ok:200,text/html; charset=utf-8,26607,
+YNDX,https://ir.yandex/events,1,ok:200,text/html; charset=utf-8,27049,
+YNDX,https://ir.yandex/financial-releases?archive,2,ok:200,text/html; charset=utf-8,58780,

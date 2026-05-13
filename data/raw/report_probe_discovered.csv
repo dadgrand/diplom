@@ -1,0 +1,7 @@
+ticker,company_name,report_period_end,publish_date,report_type,accounting_standard,language,source_name,source_url,local_path,e_disclosure_id,raw_row_text,discovery_status,discovery_error
+SBER,ПАО Сбербанк,,,e_disclosure_discovery,,,e-disclosure,https://www.e-disclosure.ru/portal/files.aspx?id=3043,,3043,,failed,Could not download https://www.e-disclosure.ru/portal/files.aspx: HTTP 403
+SBER,ПАО Сбербанк,,,issuer_ir_page,,,issuer_ir,https://www.sberbank.com/investor-relations/groupresults,,3043,issuer investor-relations source page,manual_fallback,
+GAZP,ПАО Газпром,,,e_disclosure_discovery,,,e-disclosure,https://www.e-disclosure.ru/portal/files.aspx?id=934,,934,,failed,Could not download https://www.e-disclosure.ru/portal/files.aspx: HTTP 403
+GAZP,ПАО Газпром,,,issuer_ir_page,,,issuer_ir,https://www.gazprom.com/investors/disclosure/reports/,,934,issuer investor-relations source page,manual_fallback,
+LKOH,ПАО ЛУКОЙЛ,,,e_disclosure_discovery,,,e-disclosure,https://www.e-disclosure.ru/portal/files.aspx?id=17,,17,,failed,Could not download https://www.e-disclosure.ru/portal/files.aspx: HTTP 403
+LKOH,ПАО ЛУКОЙЛ,,,issuer_ir_page,,,issuer_ir,https://www.lukoil.com/InvestorAndShareholderCenter/FinancialReports,,17,issuer investor-relations source page,manual_fallback,
