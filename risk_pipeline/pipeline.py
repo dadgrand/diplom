@@ -115,6 +115,15 @@ def _report_feature_selection_score(bundle: CandidateBundle, validation: pd.Data
     }
 
 
+def _risk_detection_selection_score(metrics: dict[str, Any]) -> float:
+    """Validation objective for the final architecture.
+
+    Macro-F1 is the main quality signal, while high-risk recall receives a small
+    bonus because the applied task is conservative risk detection.
+    """
+    return float(metrics.get("macro_f1", 0.0) or 0.0) + 0.03 * float(metrics.get("high_recall", 0.0) or 0.0)
+
+
 def _is_report_feature(name: str) -> bool:
     return name.startswith("report_") or name in {"fundamental_report_gap"}
 
@@ -302,16 +311,83 @@ def run_modeling_pipeline(df: pd.DataFrame, cfg: ProjectConfig, artifact_dir: st
     if overlay.sector_report_ is not None:
         overlay.sector_report_.to_csv(artifact_dir / "sector_overlay_report.csv", index=False)
 
+    val_overlay_frame["sector_overlay_pred"] = overlay.predict(
+        val_overlay_frame,
+        sector_col="sector",
+        global_pred_col="global_pred",
+        expert_pred_col="expert_pred",
+    )
+
     test_pred_frame = test[["decision_date", "ticker", "sector", "risk_class"]].copy()
     for col, pred in test_pred.items():
         test_pred_frame[col] = pred
     test_pred_frame["sector_overlay_pred"] = overlay.predict(test_pred_frame, sector_col="sector", global_pred_col="enriched_pred", expert_pred_col="ann_regime_pred")
 
+    p_baseline = baseline_bundle.predict_proba(test)
+    p_regime = regime_bundle.predict_proba(test)
+    p_enriched_val = enriched_bundle.predict_proba(validation)
     p_enriched = enriched_bundle.predict_proba(test)
+    p_ann_val = ann_bundle.predict_proba(val_ae)
     p_ann = ann_bundle.predict_proba(test_ae)
+    use_expert_val = val_overlay_frame["sector"].astype(str).isin(overlay.selected_sectors_).to_numpy()
     use_expert = test_pred_frame["sector"].astype(str).isin(overlay.selected_sectors_).to_numpy()
-    final_proba = p_enriched.copy()
-    final_proba[use_expert] = p_ann[use_expert]
+    p_sector_overlay_val = p_enriched_val.copy()
+    p_sector_overlay_val[use_expert_val] = p_ann_val[use_expert_val]
+    p_sector_overlay = p_enriched.copy()
+    p_sector_overlay[use_expert] = p_ann[use_expert]
+
+    architecture_metrics = {
+        "baseline_rf": _architecture_report(baseline_bundle, validation, test),
+        "regime_only": _architecture_report(regime_bundle, validation, test),
+        "enriched_reference": _architecture_report(enriched_bundle, validation, test),
+        "ann_plus_regime": _architecture_report(ann_bundle, val_ae, test_ae),
+    }
+    sector_overlay_validation_metrics = classification_metrics(validation["risk_class"], val_overlay_frame["sector_overlay_pred"])
+    sector_overlay_test_metrics = classification_metrics(test["risk_class"], test_pred_frame["sector_overlay_pred"])
+    sector_overlay_report = {
+        "validation": sector_overlay_validation_metrics,
+        "test": sector_overlay_test_metrics,
+        "validation_probability": probability_diagnostics(validation["risk_class"], p_sector_overlay_val),
+        "test_probability": probability_diagnostics(test["risk_class"], p_sector_overlay),
+        "selected_sectors": sorted(overlay.selected_sectors_),
+    }
+    architecture_selection = {
+        name: {
+            "selection_score": _risk_detection_selection_score(report["validation"]),
+            **report["validation"],
+        }
+        for name, report in architecture_metrics.items()
+    }
+    architecture_selection["sector_overlay"] = {
+        "selection_score": _risk_detection_selection_score(sector_overlay_validation_metrics),
+        **sector_overlay_validation_metrics,
+    }
+    final_architecture = max(
+        architecture_selection,
+        key=lambda name: (
+            architecture_selection[name]["selection_score"],
+            architecture_selection[name]["macro_f1"],
+            architecture_selection[name]["high_recall"],
+        ),
+    )
+    final_pred_by_arch = {
+        "baseline_rf": test_pred["baseline_pred"],
+        "regime_only": test_pred["regime_pred"],
+        "enriched_reference": test_pred["enriched_pred"],
+        "ann_plus_regime": test_pred["ann_regime_pred"],
+        "sector_overlay": test_pred_frame["sector_overlay_pred"].to_numpy(),
+    }
+    final_proba_by_arch = {
+        "baseline_rf": p_baseline,
+        "regime_only": p_regime,
+        "enriched_reference": p_enriched,
+        "ann_plus_regime": p_ann,
+        "sector_overlay": p_sector_overlay,
+    }
+    test_pred_frame["predicted_risk_class"] = final_pred_by_arch[final_architecture]
+    test_pred_frame["final_architecture"] = final_architecture
+    test_pred_frame["used_sector_expert"] = use_expert
+    final_proba = final_proba_by_arch[final_architecture]
     for i, cls in enumerate(CLASSES):
         test_pred_frame[f"p_{cls}"] = final_proba[:, i]
 
@@ -327,13 +403,7 @@ def run_modeling_pipeline(df: pd.DataFrame, cfg: ProjectConfig, artifact_dir: st
     wf_frame = _walk_forward_enriched_scores(labeled, selected_enriched_features, ["sector", "regime_cluster"], cfg)
     wf_frame.to_csv(artifact_dir / "walk_forward_report.csv", index=False)
 
-    architecture_metrics = {
-        "baseline_rf": _architecture_report(baseline_bundle, validation, test),
-        "regime_only": _architecture_report(regime_bundle, validation, test),
-        "enriched_reference": _architecture_report(enriched_bundle, validation, test),
-        "ann_plus_regime": _architecture_report(ann_bundle, val_ae, test_ae),
-    }
-    final_metrics = classification_metrics(test["risk_class"], test_pred_frame["sector_overlay_pred"])
+    final_metrics = classification_metrics(test["risk_class"], test_pred_frame["predicted_risk_class"])
     metrics: dict[str, object] = {
         "n_train": int(len(train)),
         "n_validation": int(len(validation)),
@@ -349,17 +419,24 @@ def run_modeling_pipeline(df: pd.DataFrame, cfg: ProjectConfig, artifact_dir: st
         "autoencoder_backend": ae.fitted_with_,
         "autoencoder_reconstruction_loss": ae.reconstruction_loss_,
         "architectures": architecture_metrics,
+        "sector_overlay": sector_overlay_report,
+        "final_architecture": final_architecture,
+        "final_architecture_selection": architecture_selection,
         "test": {
             "baseline_rf": architecture_metrics["baseline_rf"]["test"],
             "regime_only": architecture_metrics["regime_only"]["test"],
             "ann_plus_regime": architecture_metrics["ann_plus_regime"]["test"],
             "enriched_reference": architecture_metrics["enriched_reference"]["test"],
-            "sector_overlay": final_metrics,
+            "sector_overlay": sector_overlay_test_metrics,
+            "final_selected": final_metrics,
         },
-        "sector_overlay_probability": probability_diagnostics(test["risk_class"], final_proba),
+        "sector_overlay_probability": probability_diagnostics(test["risk_class"], p_sector_overlay),
+        "final_probability": probability_diagnostics(test["risk_class"], final_proba),
         "confusion_sector_overlay": confusion_as_frame(test["risk_class"], test_pred_frame["sector_overlay_pred"]).to_dict(),
+        "confusion_final": confusion_as_frame(test["risk_class"], test_pred_frame["predicted_risk_class"]).to_dict(),
         "classwise_sector_overlay": classwise_metrics_frame(test["risk_class"], test_pred_frame["sector_overlay_pred"]).to_dict(orient="records"),
-        "economic_monotonicity": economic_monotonicity(test_pred_frame.rename(columns={"sector_overlay_pred": "predicted_class"})).to_dict(orient="records"),
+        "classwise_final": classwise_metrics_frame(test["risk_class"], test_pred_frame["predicted_risk_class"]).to_dict(orient="records"),
+        "economic_monotonicity": economic_monotonicity(test_pred_frame.rename(columns={"predicted_risk_class": "predicted_class"})).to_dict(orient="records"),
         "walk_forward": {
             "folds": int(len(wf_frame)),
             "macro_f1_mean": float(wf_frame["macro_f1"].mean()) if not wf_frame.empty else None,
@@ -415,9 +492,12 @@ def run_modeling_pipeline(df: pd.DataFrame, cfg: ProjectConfig, artifact_dir: st
         model_package = {
             "classes": CLASSES,
             "features": {"enriched": selected_enriched_features, "ann": ann_features},
+            "final_architecture": final_architecture,
             "target_ranker": target_ranker,
             "regime_clusterer": regime,
             "autoencoder": ae,
+            "baseline_bundle": baseline_bundle,
+            "regime_bundle": regime_bundle,
             "enriched_bundle": enriched_bundle,
             "ann_bundle": ann_bundle,
             "overlay": overlay,

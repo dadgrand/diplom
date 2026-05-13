@@ -29,6 +29,9 @@ def predict_model_ready(df: pd.DataFrame, model_package: dict) -> pd.DataFrame:
     regime = model_package["regime_clusterer"]
     data = data.copy()
     data["regime_cluster"] = regime.transform(data)
+    final_architecture = model_package.get("final_architecture", "sector_overlay")
+    baseline_bundle = model_package.get("baseline_bundle")
+    regime_bundle = model_package.get("regime_bundle")
     enriched_bundle = model_package["enriched_bundle"]
     ann_bundle = model_package["ann_bundle"]
     ae = model_package["autoencoder"]
@@ -44,8 +47,24 @@ def predict_model_ready(df: pd.DataFrame, model_package: dict) -> pd.DataFrame:
     final_proba = enriched_proba.copy()
     final_proba[use_expert] = ann_proba[use_expert]
 
+    if final_architecture == "baseline_rf" and baseline_bundle is not None:
+        final_pred = baseline_bundle.predict(data)
+        final_proba = baseline_bundle.predict_proba(data)
+    elif final_architecture == "regime_only" and regime_bundle is not None:
+        final_pred = regime_bundle.predict(data)
+        final_proba = regime_bundle.predict_proba(data)
+    elif final_architecture == "enriched_reference":
+        final_pred = enriched_pred
+        final_proba = enriched_proba
+    elif final_architecture == "ann_plus_regime":
+        final_pred = ann_pred
+        final_proba = ann_proba
+    else:
+        final_architecture = "sector_overlay"
+
     out_cols = [c for c in ["decision_date", "ticker", "sector"] if c in df.columns]
     out = df[out_cols].copy() if out_cols else pd.DataFrame(index=df.index)
+    out["final_architecture"] = final_architecture
     out["predicted_risk_class"] = final_pred
     for i, cls in enumerate(CLASSES):
         out[f"p_{cls}"] = final_proba[:, i]

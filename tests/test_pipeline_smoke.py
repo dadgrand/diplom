@@ -16,4 +16,7 @@ def test_run_modeling_pipeline_smoke(tmp_path):
     result = run_modeling_pipeline(df, cfg, artifact_dir=tmp_path)
     assert result.predictions.shape[0] > 0
     assert "sector_overlay" in result.metrics["test"]
+    assert "final_selected" in result.metrics["test"]
+    assert result.metrics["final_architecture"] in result.metrics["final_architecture_selection"]
+    assert "predicted_risk_class" in result.predictions.columns
     assert (tmp_path / "feature_drift_report.csv").exists()
