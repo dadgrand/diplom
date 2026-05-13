@@ -91,6 +91,7 @@ def build_model_ready_panel_from_paths(
     if report_features is not None and not report_features.empty:
         panel = merge_financial_report_features_pit(panel_no_reports, report_features)
         if report_coverage_output_path:
+            Path(report_coverage_output_path).parent.mkdir(parents=True, exist_ok=True)
             coverage_report(panel_no_reports, panel).to_csv(report_coverage_output_path, index=False)
             write_report_layer_summary(report_features, panel, Path(report_coverage_output_path).with_suffix(".json"))
     else:
