@@ -1,0 +1,19 @@
+ticker,company_name,sector,include_flag
+SBER,ПАО Сбербанк,banks_financials,1
+GAZP,ПАО Газпром,oil_gas,1
+LKOH,ПАО ЛУКОЙЛ,oil_gas,1
+ROSN,ПАО НК Роснефть,oil_gas,1
+NVTK,ПАО НОВАТЭК,oil_gas,1
+GMKN,ПАО ГМК Норильский никель,metals_mining,1
+MOEX,ПАО Московская Биржа,banks_financials,1
+TATN,ПАО Татнефть,oil_gas,1
+VTBR,Банк ВТБ (ПАО),banks_financials,1
+CHMF,ПАО Северсталь,metals_mining,1
+PLZL,ПАО Полюс,metals_mining,1
+MGNT,ПАО Магнит,retail,1
+ALRS,АК АЛРОСА (ПАО),metals_mining,1
+AFLT,ПАО Аэрофлот,transport,1
+PHOR,ПАО ФосАгро,chemicals,1
+RUAL,МКПАО ОК РУСАЛ,metals_mining,1
+SNGS,ПАО Сургутнефтегаз,oil_gas,1
+YNDX,Yandex NV,technology,1

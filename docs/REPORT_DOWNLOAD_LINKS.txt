@@ -1,0 +1,214 @@
+СПИСОК ЭМИТЕНТОВ И ССЫЛОК ДЛЯ РУЧНОГО СКАЧИВАНИЯ ОТЧЕТОВ
+
+Общий период скачивания:
+    publish_date с 2022-01-01 по 2025-08-31 включительно.
+
+Что скачивать по каждой компании:
+    1. МСФО / IFRS financial statements: FY 2021, FY 2022, FY 2023, FY 2024.
+    2. Промежуточные МСФО: Q1/H1/9M за 2022, 2023, 2024; Q1/H1 за 2025,
+       если опубликованы до 2025-08-31.
+    3. Annual report за 2021, 2022, 2023, 2024.
+
+Куда складывать:
+    data/raw/reports/<TICKER>/
+
+
+1. SBER - ПАО Сбербанк
+Папка:
+    data/raw/reports/SBER/
+Ссылки:
+    https://www.sberbank.com/investor-relations/groupresults
+    https://www.e-disclosure.ru/portal/files.aspx?id=3043&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=3043&type=2
+Что искать:
+    IFRS / МСФО, annual report, group results, годовые отчеты.
+
+
+2. GAZP - ПАО Газпром
+Папка:
+    data/raw/reports/GAZP/
+Ссылки:
+    https://www.gazprom.com/investors/disclosure/reports/
+    https://www.e-disclosure.ru/portal/files.aspx?id=934&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=934&type=2
+Что искать:
+    Consolidated financial statements, IFRS, annual report.
+
+
+3. LKOH - ПАО ЛУКОЙЛ
+Папка:
+    data/raw/reports/LKOH/
+Ссылки:
+    https://www.lukoil.com/InvestorAndShareholderCenter/FinancialReports
+    https://www.e-disclosure.ru/portal/files.aspx?id=17&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=17&type=2
+Что искать:
+    Financial reports, IFRS, quarterly/interim results, annual report.
+
+
+4. ROSN - ПАО НК Роснефть
+Папка:
+    data/raw/reports/ROSN/
+Ссылки:
+    https://www.rosneft.com/Investors/statements_and_presentations/Financial_statements/
+    https://www.e-disclosure.ru/portal/files.aspx?id=6505&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=6505&type=2
+Что искать:
+    Consolidated IFRS financial statements, annual reports.
+
+
+5. NVTK - ПАО НОВАТЭК
+Папка:
+    data/raw/reports/NVTK/
+Ссылки:
+    https://www.novatek.ru/en/investors/financial-results/
+    https://www.e-disclosure.ru/portal/files.aspx?id=225&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=225&type=2
+Что искать:
+    Financial results, IFRS statements, annual reports.
+
+
+6. GMKN - ПАО ГМК Норильский никель
+Папка:
+    data/raw/reports/GMKN/
+Ссылки:
+    https://www.nornickel.com/investors/reports-and-results/annual-reports/
+    https://www.e-disclosure.ru/portal/files.aspx?id=564&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=564&type=2
+Что искать:
+    Annual reports, IFRS financial statements, results and reports.
+
+
+7. MOEX - ПАО Московская Биржа
+Папка:
+    data/raw/reports/MOEX/
+Ссылки:
+    https://www.moex.com/s1355
+    https://www.e-disclosure.ru/portal/files.aspx?id=43&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=43&type=2
+Что искать:
+    IFRS financial statements, annual reports, quarterly reports.
+
+
+8. TATN - ПАО Татнефть
+Папка:
+    data/raw/reports/TATN/
+Ссылки:
+    https://www.tatneft.ru/en/shareholders-and-investors/disclosure-of-information/financial-statements
+    https://www.e-disclosure.ru/portal/files.aspx?id=118&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=118&type=2
+Что искать:
+    Financial statements, IFRS, annual reports.
+
+
+9. VTBR - Банк ВТБ (ПАО)
+Папка:
+    data/raw/reports/VTBR/
+Ссылки:
+    https://www.vtb.com/ir/statements/
+    https://www.e-disclosure.ru/portal/files.aspx?id=1210&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=1210&type=2
+Что искать:
+    IFRS financial statements, annual reports, bank financial results.
+
+
+10. CHMF - ПАО Северсталь
+Папка:
+    data/raw/reports/CHMF/
+Ссылки:
+    https://www.severstal.com/eng/ir/results-and-reports/financial-results/
+    https://www.e-disclosure.ru/portal/files.aspx?id=30&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=30&type=2
+Что искать:
+    Financial results, IFRS reports, annual reports.
+
+
+11. PLZL - ПАО Полюс
+Папка:
+    data/raw/reports/PLZL/
+Ссылки:
+    https://polyus.com/en/investors/results-and-reports/
+    https://www.e-disclosure.ru/portal/files.aspx?id=7832&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=7832&type=2
+Что искать:
+    Results and reports, IFRS statements, annual reports.
+
+
+12. MGNT - ПАО Магнит
+Папка:
+    data/raw/reports/MGNT/
+Ссылки:
+    https://www.magnit.com/en/shareholders-and-investors/results-and-reports/financial-results/
+    https://www.e-disclosure.ru/portal/files.aspx?id=7671&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=7671&type=2
+Что искать:
+    Financial results, IFRS, annual reports.
+
+
+13. ALRS - АК АЛРОСА (ПАО)
+Папка:
+    data/raw/reports/ALRS/
+Ссылки:
+    https://www.alrosa.ru/en/investors/results-and-reports/
+    https://www.e-disclosure.ru/portal/files.aspx?id=199&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=199&type=2
+Что искать:
+    Results and reports, annual reports, IFRS financial statements.
+
+
+14. AFLT - ПАО Аэрофлот
+Папка:
+    data/raw/reports/AFLT/
+Ссылки:
+    https://ir.aeroflot.ru/financial-results-and-presentations/financial-statements/
+    https://www.e-disclosure.ru/portal/files.aspx?id=1480&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=1480&type=2
+Что искать:
+    Financial statements, IFRS, annual reports.
+
+
+15. PHOR - ПАО ФосАгро
+Папка:
+    data/raw/reports/PHOR/
+Ссылки:
+    https://www.phosagro.com/investors/reports/
+    https://www.e-disclosure.ru/portal/files.aspx?id=573&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=573&type=2
+Что искать:
+    Reports, financial results, IFRS, annual reports.
+
+
+16. RUAL - МКПАО ОК РУСАЛ
+Папка:
+    data/raw/reports/RUAL/
+Ссылки:
+    https://rusal.ru/en/investors/financial_reports/
+    https://www.e-disclosure.ru/portal/files.aspx?id=38288&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=38288&type=2
+Что искать:
+    Financial reports, annual reports, IFRS.
+
+
+17. SNGS - ПАО Сургутнефтегаз
+Папка:
+    data/raw/reports/SNGS/
+Ссылки:
+    https://www.surgutneftegas.ru/en/investors/reports/
+    https://www.e-disclosure.ru/portal/files.aspx?id=312&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=312&type=2
+Что искать:
+    Reports, annual reports, financial statements.
+
+
+18. YNDX - Yandex NV / legacy mapping
+Папка:
+    data/raw/reports/YNDX/
+Ссылки:
+    https://ir.yandex/
+    https://www.e-disclosure.ru/portal/files.aspx?id=34514&type=4
+    https://www.e-disclosure.ru/portal/files.aspx?id=34514&type=2
+Что искать:
+    Annual reports, financial results, IFRS/US GAAP statements.
+Важно:
+    Не смешивать legacy Yandex NV и текущий российский Yandex/YDEX без отдельного
+    решения по universe и тикеру в модели.

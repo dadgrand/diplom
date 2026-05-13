@@ -1,0 +1,3 @@
+ticker,company_name,report_period_end,publish_date,report_type,accounting_standard,language,source_name,source_url,local_path
+SBER,ПАО Сбербанк,2024-12-31,2025-02-27,ifrs_consolidated,IFRS,ru,issuer_ir,https://www.sberbank.com/investor-relations/groupresults/results_of_work_on_ifrs_q42024,reports/SBER/SBER_2024_IFRS.pdf
+LKOH,ПАО ЛУКОЙЛ,2024-12-31,2025-03-24,ifrs_consolidated,IFRS,ru,issuer_ir,https://www.lukoil.com/InvestorAndShareholderCenter/FinancialReports,reports/LKOH/LKOH_2024_IFRS.pdf

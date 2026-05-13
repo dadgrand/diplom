@@ -1,0 +1,159 @@
+project:
+  random_state: 42
+  artifact_dir: results/run_real
+
+data:
+  horizon_days: 126
+  id_col: ticker
+  date_col: decision_date
+  target_col: risk_class
+
+split:
+  train_start: "2023-07-01"
+  train_end: "2024-08-31"
+  validation_start: "2024-09-01"
+  validation_end: "2025-02-28"
+  test_start: "2025-03-01"
+  test_end: "2025-08-31"
+
+features:
+  enable_derived_features: true
+  categorical:
+    - sector
+    - regime_cluster
+  regime:
+    - cbr_key_rate
+    - usd_rub
+    - ofz_slope_10y_2y
+    - imoex_realized_vol_20d
+    - average_market_correlation_60d
+  model_v1:
+    - log_market_cap
+    - book_to_market
+    - beta_60d
+    - rolling_vol_20d
+    - downside_vol_60d
+    - momentum_6m
+    - amihud_20d
+    - avg_daily_traded_value_20d
+    - spread_proxy
+    - turnover_ratio
+    - cbr_key_rate
+    - usd_rub
+    - ofz_slope_10y_2y
+    - imoex_realized_vol_20d
+    - average_market_correlation_60d
+  model_v2_extra:
+    - net_debt_to_ebitda
+    - interest_coverage
+    - operating_cash_flow
+    - free_cash_flow
+    - ebitda_margin
+    - net_debt_to_ebitda_missing
+    - interest_coverage_missing
+    - cash_flow_missing
+    - report_available
+    - report_stale_flag
+    - report_lag_days
+    - report_extraction_quality
+    - report_document_available
+    - report_financial_pressure
+    - report_revenue
+    - report_ebitda
+    - report_net_profit
+    - report_operating_cash_flow
+    - report_free_cash_flow
+    - report_capex
+    - report_total_debt
+    - report_cash_and_equivalents
+    - report_net_debt
+    - report_net_debt_to_ebitda
+    - report_interest_coverage
+    - report_ebitda_margin
+    - report_net_margin
+    - report_operating_cf_margin
+    - report_free_cf_margin
+    - report_capex_intensity
+    - report_equity_ratio
+    - report_debt_to_assets
+    - report_short_debt_share
+    - report_text_risk_density
+    - report_text_risk_terms_total
+    - report_sanctions_count
+    - report_currency_fx_count
+    - report_liquidity_refinancing_count
+    - report_covenant_flag
+    - report_impairment_count
+    - report_litigation_count
+    - report_auditor_emphasis_flag
+    - report_dividend_pressure_flag
+    - report_revenue_yoy_change
+    - report_ebitda_yoy_change
+    - report_net_profit_yoy_change
+    - report_free_cash_flow_yoy_change
+    - report_total_debt_yoy_change
+    - report_net_debt_yoy_change
+  cross_sectional_rank_features:
+    - log_market_cap
+    - beta_60d
+    - rolling_vol_20d
+    - downside_vol_60d
+    - amihud_20d
+    - avg_daily_traded_value_20d
+    - spread_proxy
+    - turnover_ratio
+    - net_debt_to_ebitda
+    - interest_coverage
+    - free_cash_flow
+    - report_financial_pressure
+    - report_net_debt_to_ebitda
+    - report_interest_coverage
+    - report_free_cf_margin
+    - report_text_risk_density
+    - report_lag_days
+    - report_integrated_stress
+  derived_features:
+    - downside_to_total_vol
+    - liquidity_stress
+    - liquidity_vol_interaction
+    - beta_vol_interaction
+    - macro_pressure
+    - rate_fx_pressure
+    - curve_inversion_flag
+    - debt_service_stress
+    - cashflow_buffer
+    - size_liquidity_interaction
+    - momentum_reversal_risk
+    - fundamental_fragility
+    - report_leverage_pressure
+    - report_cashflow_pressure
+    - report_staleness_weight
+    - report_integrated_stress
+    - fundamental_report_gap
+model:
+  candidates: [rf, extra, gb]
+  n_estimators: 500
+  min_samples_leaf: 4
+  class_weight: balanced_subsample
+  n_jobs: -1
+  regime_k: 2
+  autoencoder_latent_dim: 3
+  autoencoder_hidden_dim: 8
+  autoencoder_epochs: 80
+  ensemble_weight_step: 0.10
+  calibration_grid: [0.65, 0.80, 1.00, 1.25, 1.50, 1.80]
+  high_recall_bonus: 0.02
+  overlay_min_sector_rows: 18
+  overlay_min_gain: 0.10
+
+walk_forward:
+  initial_months: 12
+  validation_months: 3
+  test_months: 3
+  step_months: 3
+
+diagnostics:
+  psi_bins: 10
+  drift_psi_warn: 0.20
+  run_data_quality_checks: true
+  save_model_package: true

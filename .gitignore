@@ -1,0 +1,38 @@
+# Python/cache artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+
+# Virtual environments and local configuration
+.venv/
+venv/
+env/
+.env
+.env.*
+
+# Generated data and model artifacts
+data/raw/
+data/processed/
+results/
+*.parquet
+*.pq
+*.joblib
+
+# Large downloaded report documents
+*.pdf
+*.zip
+*.xlsx
+*.xls
+*.xlsm
+*.doc
+*.docx
+
+# Notebooks runtime artifacts
+.ipynb_checkpoints/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
