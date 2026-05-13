@@ -33,6 +33,18 @@ def write_run_report(metrics: dict[str, Any], path: str | Path) -> None:
             f"| {name} | {_fmt(row.get('macro_f1'))} | {_fmt(row.get('balanced_accuracy'))} | {_fmt(row.get('high_recall'))} | {_fmt(row.get('high_precision'))} |"
         )
     lines.append("")
+    lines.append("## Final selection")
+    lines.append("")
+    lines.append(f"- Selected architecture: {metrics.get('final_architecture') or 'n/a'}")
+    final_probability = metrics.get("final_probability", {}) or {}
+    if final_probability:
+        lines.append(f"- Final mean confidence: {_fmt(final_probability.get('mean_confidence'))}")
+        lines.append(f"- Final ECE, 10 bins: {_fmt(final_probability.get('ece_10_bins'))}")
+    report_layer = metrics.get("report_layer_selection", {}) or {}
+    if report_layer:
+        lines.append(f"- Financial-report layer: {report_layer.get('selected')}")
+        lines.append(f"- Financial-report feature count: {report_layer.get('report_feature_count')}")
+    lines.append("")
     lines.append("## Stability")
     lines.append("")
     wf = metrics.get("walk_forward", {}) or {}
