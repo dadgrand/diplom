@@ -1,6 +1,6 @@
 # Financial report layer: Aladdin-style issuer intelligence
 
-This module adds a deterministic financial-report layer to the point-in-time risk pipeline. The goal is to use issuer reporting as an additional source of information without turning the model into an unverifiable LLM system.
+This module adds a deterministic financial-report layer to the point-in-time risk pipeline. The goal is to use issuer reporting as an additional source of information without turning the model into an unverifiable text-scoring system.
 
 ## What the layer does
 

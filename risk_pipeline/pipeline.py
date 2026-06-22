@@ -26,7 +26,6 @@ from .reporting import write_run_report
 from .splits import temporal_train_val_test, walk_forward_splits
 from .targets import COMPONENTS, TargetRanker
 
-
 @dataclass
 class PipelineResult:
     metrics: dict[str, object]
@@ -100,12 +99,10 @@ def _architecture_report(bundle: CandidateBundle, validation: pd.DataFrame, test
     }
 
 
-def _report_feature_selection_score(bundle: CandidateBundle, validation: pd.DataFrame) -> dict[str, float]:
+def _report_feature_selection_score(bundle: CandidateBundle, validation: pd.DataFrame, high_recall_bonus: float) -> dict[str, float]:
     pred = bundle.predict(validation)
     metrics = classification_metrics(validation["risk_class"], pred)
-    # High-risk recall is rewarded because the business task is risk detection,
-    # but macro-F1 remains the main optimization target.
-    score = float(metrics.get("macro_f1", 0.0) or 0.0) + 0.03 * float(metrics.get("high_recall", 0.0) or 0.0)
+    score = float(metrics.get("macro_f1", 0.0) or 0.0) + high_recall_bonus * float(metrics.get("high_recall", 0.0) or 0.0)
     return {
         "selection_score": score,
         "macro_f1": float(metrics.get("macro_f1", 0.0) or 0.0),
@@ -115,13 +112,8 @@ def _report_feature_selection_score(bundle: CandidateBundle, validation: pd.Data
     }
 
 
-def _risk_detection_selection_score(metrics: dict[str, Any]) -> float:
-    """Validation objective for the final architecture.
-
-    Macro-F1 is the main quality signal, while high-risk recall receives a small
-    bonus because the applied task is conservative risk detection.
-    """
-    return float(metrics.get("macro_f1", 0.0) or 0.0) + 0.03 * float(metrics.get("high_recall", 0.0) or 0.0)
+def _risk_detection_selection_score(metrics: dict[str, Any], high_recall_bonus: float) -> float:
+    return float(metrics.get("macro_f1", 0.0) or 0.0) + high_recall_bonus * float(metrics.get("high_recall", 0.0) or 0.0)
 
 
 def _is_report_feature(name: str) -> bool:
@@ -163,8 +155,6 @@ def _walk_forward_enriched_scores(labeled: pd.DataFrame, enriched_features: list
         wf_train["regime_cluster"] = wf_regime.transform(wf_train)
         wf_val["regime_cluster"] = wf_regime.transform(wf_val)
         wf_test["regime_cluster"] = wf_regime.transform(wf_test)
-        # Keep walk-forward lighter than the main fit but still use the same architecture.
-        cfg_light = cfg
         bundle = fit_candidate_bundle(
             "wf_enriched",
             wf_train,
@@ -187,7 +177,6 @@ def _walk_forward_enriched_scores(labeled: pd.DataFrame, enriched_features: list
 
 
 def run_modeling_pipeline(df: pd.DataFrame, cfg: ProjectConfig, artifact_dir: str | Path | None = None) -> PipelineResult:
-    """Run the full modeling stack on a model-ready monthly panel."""
     artifact_dir = Path(artifact_dir or cfg.artifact_dir)
     artifact_dir.mkdir(parents=True, exist_ok=True)
 
@@ -208,7 +197,6 @@ def run_modeling_pipeline(df: pd.DataFrame, cfg: ProjectConfig, artifact_dir: st
 
     split_check = validate_temporal_split(train, validation, test)
 
-    # Regime labels are fitted only on train and then attached to future periods.
     regime = RegimeClusterer(cfg.features.regime, n_clusters=cfg.model.regime_k, random_state=cfg.random_state).fit(train)
     for part in [train, validation, test]:
         part["regime_cluster"] = regime.transform(part)
@@ -249,8 +237,8 @@ def run_modeling_pipeline(df: pd.DataFrame, cfg: ProjectConfig, artifact_dir: st
             ["sector", "regime_cluster"],
             cfg,
         )
-        no_report_score = _report_feature_selection_score(enriched_no_report_bundle, validation)
-        with_report_score = _report_feature_selection_score(enriched_report_bundle, validation)
+        no_report_score = _report_feature_selection_score(enriched_no_report_bundle, validation, cfg.model.high_recall_bonus)
+        with_report_score = _report_feature_selection_score(enriched_report_bundle, validation, cfg.model.high_recall_bonus)
         min_gain = 0.005
         use_reports = with_report_score["selection_score"] >= no_report_score["selection_score"] + min_gain
         enriched_bundle = enriched_report_bundle if use_reports else enriched_no_report_bundle
@@ -269,7 +257,6 @@ def run_modeling_pipeline(df: pd.DataFrame, cfg: ProjectConfig, artifact_dir: st
         selected_enriched_features = enriched_features
         enriched_candidates.append(enriched_bundle)
 
-    # Autoencoder branch: fit on train numeric features and append latent factors.
     ae_numeric = _present(train, [f for f in cfg.features.model_v1 + cfg.features.model_v2_extra + derived_added if f in selected_enriched_features])
     ae = AutoencoderFactors(
         numeric_features=ae_numeric,
@@ -353,13 +340,13 @@ def run_modeling_pipeline(df: pd.DataFrame, cfg: ProjectConfig, artifact_dir: st
     }
     architecture_selection = {
         name: {
-            "selection_score": _risk_detection_selection_score(report["validation"]),
+            "selection_score": _risk_detection_selection_score(report["validation"], cfg.model.high_recall_bonus),
             **report["validation"],
         }
         for name, report in architecture_metrics.items()
     }
     architecture_selection["sector_overlay"] = {
-        "selection_score": _risk_detection_selection_score(sector_overlay_validation_metrics),
+        "selection_score": _risk_detection_selection_score(sector_overlay_validation_metrics, cfg.model.high_recall_bonus),
         **sector_overlay_validation_metrics,
     }
     final_architecture = max(
@@ -412,6 +399,7 @@ def run_modeling_pipeline(df: pd.DataFrame, cfg: ProjectConfig, artifact_dir: st
         "target_thresholds": {"low_upper": target_ranker.thresholds_[0], "medium_upper": target_ranker.thresholds_[1]} if target_ranker.thresholds_ else {},
         "added_features_count": int(len(added_features)),
         "added_features": added_features,
+        "high_recall_bonus": float(cfg.model.high_recall_bonus),
         "split_check": split_check,
         "data_quality": data_quality.to_dict(orient="records"),
         "validation_selected_overlay_sectors": sorted(overlay.selected_sectors_),

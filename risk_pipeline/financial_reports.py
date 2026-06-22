@@ -38,8 +38,6 @@ CONTENT_TYPE_EXTENSIONS = {
     "text/html": ".html",
     "application/xhtml+xml": ".html",
 }
-
-# Russian and English names encountered in annual reports, IFRS statements and MD&A.
 METRIC_SYNONYMS: dict[str, list[str]] = {
     "report_revenue": [
         r"выручк[аи]",
@@ -92,9 +90,6 @@ METRIC_SYNONYMS: dict[str, list[str]] = {
     "report_provisions": [r"резерв\w+", r"provisions?"],
     "report_cet1_ratio": [r"норматив\s+достаточности\s+базового\s+капитала", r"cet1", r"tier\s+1\s+capital\s+ratio"],
 }
-
-# Textual risk concepts. The output is deliberately deterministic: counts and flags,
-# not LLM-generated judgements.
 TEXT_SIGNAL_PATTERNS: dict[str, list[str]] = {
     "sanctions": [r"санкци", r"sanction", r"restricted\s+market", r"market\s+access"],
     "currency_fx": [r"валютн\w+\s+риск", r"курсов\w+\s+разниц", r"foreign\s+exchange", r"currency\s+risk", r"fx\s+risk"],
@@ -155,8 +150,6 @@ def _parse_date(value: Any) -> pd.Timestamp | pd.NaT:
     if isinstance(value, pd.Timestamp):
         return value
     text = str(value).strip()
-    # ISO strings must not be parsed with dayfirst=True because 2024-03-01
-    # would otherwise become 2024-01-03. E-disclosure dates are DD.MM.YYYY.
     if re.match(r"^\d{4}-\d{2}-\d{2}", text):
         return pd.to_datetime(text, errors="coerce", dayfirst=False)
     return pd.to_datetime(text, errors="coerce", dayfirst=True)
@@ -167,8 +160,6 @@ def _supported_extension(ext: str | None) -> str | None:
         return None
     ext = ext.lower().strip()
     if ext == ".xls":
-        # Binary XLS is not parsed by the extractor; keep it explicit instead of
-        # silently pretending it is XLSX.
         return None
     return ext if ext in SUPPORTED_REPORT_EXTENSIONS else None
 
@@ -325,7 +316,6 @@ def parse_financial_number(raw: str | None, *, scale_text: str | None = None, de
         return np.nan
 
     if "," in text and "." in text:
-        # The rightmost separator is treated as decimal; the rest as thousands.
         comma = text.rfind(",")
         dot = text.rfind(".")
         if comma > dot:
@@ -333,7 +323,6 @@ def parse_financial_number(raw: str | None, *, scale_text: str | None = None, de
         else:
             text = text.replace(",", "")
     elif "," in text:
-        # If the last comma has 1-2 digits after it, it is decimal; otherwise thousands.
         tail = text.rsplit(",", 1)[-1]
         text = text.replace(",", ".") if 0 < len(tail) <= 2 else text.replace(",", "")
     elif text.count(".") > 1:
@@ -357,14 +346,14 @@ def _normalize_text(text: str) -> str:
 def _extract_pdf_text(path: Path) -> str:
     try:
         from pypdf import PdfReader  # type: ignore
-    except Exception as exc:  # pragma: no cover - optional dependency branch
+    except Exception as exc:  # pragma: no cover - ветка опциональной зависимости
         raise RuntimeError("pypdf is required to extract PDF text; install pypdf or provide pre-extracted .txt/.md") from exc
     reader = PdfReader(str(path))
     chunks: list[str] = []
     for page in reader.pages:
         try:
             chunks.append(page.extract_text() or "")
-        except Exception as exc:  # pragma: no cover - corrupted PDF branch
+        except Exception as exc:  # pragma: no cover - ветка битого pdf
             LOGGER.warning("PDF page extraction failed for %s: %s", path, exc)
     return "\n".join(chunks)
 
@@ -372,7 +361,7 @@ def _extract_pdf_text(path: Path) -> str:
 def _extract_xlsx_text(path: Path) -> str:
     try:
         import openpyxl  # type: ignore
-    except Exception as exc:  # pragma: no cover - optional dependency branch
+    except Exception as exc:  # pragma: no cover - ветка опциональной зависимости
         raise RuntimeError("openpyxl is required to extract XLSX report tables") from exc
     wb = openpyxl.load_workbook(path, read_only=True, data_only=True)
     chunks: list[str] = []
@@ -390,8 +379,6 @@ def extract_text_from_path(path: str | Path) -> str:
     path = Path(path)
     suffix = _supported_extension(path.suffix)
     if suffix is None and path.exists():
-        # Some disclosure portals serve files through extensionless handlers such
-        # as FileLoad.ashx. Detect the real type from the bytes before failing.
         suffix = _extension_from_magic_bytes(path.read_bytes())
     if suffix in {".txt", ".md", ".csv", ".html", ".htm"}:
         return path.read_text(encoding="utf-8", errors="ignore")
@@ -423,8 +410,6 @@ def _candidate_numbers_after_keyword(text: str, keyword_regex: str, *, default_m
     for match in pattern.finditer(text):
         start = match.end()
         window = text[start : start + 260]
-        # Keep each candidate with a compact evidence string. Skip obvious years
-        # unless the number has an explicit scale multiplier.
         for num_match in re.finditer(rf"(?P<num>{NUMBER_RE})\s*(?P<scale>{SCALE_RE})?", window, flags=re.IGNORECASE):
             raw = num_match.group("num")
             scale = num_match.group("scale")
@@ -460,10 +445,6 @@ def _candidate_numbers_before_keyword(text: str, keyword_regex: str, *, default_
 def _select_best_metric_candidate(candidates: list[tuple[float, str]], metric: str) -> tuple[float, str | None]:
     if not candidates:
         return np.nan, None
-    # For line/table snippets, the first non-year after the keyword normally
-    # corresponds to the current period. If all values are small percentages,
-    # pick the first as well. For capex/interest expenses, use absolute value but
-    # keep the original sign.
     for value, evidence in candidates:
         if abs(value) > NUMERIC_EPS:
             return float(value), evidence
@@ -478,7 +459,6 @@ def extract_numeric_metrics_from_text(text: str, *, default_multiplier: float = 
         all_candidates: list[tuple[float, str]] = []
         for synonym in synonyms:
             all_candidates.extend(_candidate_numbers_after_keyword(text, synonym, default_multiplier=default_multiplier))
-            # In some tables the number is placed before the row caption.
             all_candidates.extend(_candidate_numbers_before_keyword(text, synonym, default_multiplier=default_multiplier))
         value, ev = _select_best_metric_candidate(all_candidates, metric)
         values[metric] = value
@@ -530,8 +510,6 @@ def compute_report_ratios(row: dict[str, Any]) -> dict[str, float]:
     total_assets = row.get("report_total_assets")
     equity = row.get("report_total_equity")
     short_debt = row.get("report_short_term_debt")
-
-    # If FCF is absent but OCF and capex are present, reconstruct a conservative proxy.
     fcf_proxy = fcf
     if not np.isfinite(fcf_proxy) if isinstance(fcf_proxy, float) else pd.isna(fcf_proxy):
         if pd.notna(ocf) and pd.notna(capex):
@@ -581,9 +559,6 @@ def extract_financial_report_features(
     signals = extract_text_signals(text)
     row: dict[str, Any] = {**metrics, **signals}
     row.update(compute_report_ratios(row))
-
-    # Compact deterministic composite signals. These are not labels; they are
-    # point-in-time features available after publication of a report.
     leverage = row.get("report_net_debt_to_ebitda")
     leverage_component = 0.0 if pd.isna(leverage) else float(np.clip(leverage, -2, 8) / 8.0)
     fcf_margin = row.get("report_free_cf_margin")
@@ -704,8 +679,6 @@ def build_financial_report_features(
         if not text or not str(text).strip():
             if base["parse_status"] == "not_attempted":
                 base["parse_status"] = "missing_document"
-            # Explicit missing row: useful for coverage diagnostics and for showing
-            # that an issuer/period was searched but no document is available yet.
             missing_features = {metric: np.nan for metric in METRIC_SYNONYMS}
             missing_features.update({f"{metric}_missing": 1.0 for metric in METRIC_SYNONYMS})
             missing_features.update({
@@ -737,10 +710,6 @@ def build_financial_report_features(
         converted = pd.to_numeric(out[col], errors="coerce")
         if converted.notna().sum() > 0 or out[col].isna().all():
             out[col] = converted
-
-    # Time-aware deltas are computed by ticker and period end, not by extraction
-    # order. They are safe because only reports published before decision_date are
-    # later merged into observations.
     out = out.sort_values(["ticker", "report_period_end", "publish_date"], na_position="last").reset_index(drop=True)
     yoy_metrics = [
         "report_revenue",
@@ -865,14 +834,14 @@ def _request_text(url: str, params: dict[str, Any] | None = None, retries: int =
             response.raise_for_status()
             response.encoding = response.encoding or "utf-8"
             return response.text
-        except requests.HTTPError as exc:  # pragma: no cover - network-dependent
+        except requests.HTTPError as exc:  # pragma: no cover - зависит от сети
             status = exc.response.status_code if exc.response is not None else None
             if status in {401, 403, 404}:
                 raise DownloadError(f"Could not download {url}: HTTP {status}") from exc
             last_error = exc
             LOGGER.warning("request failed: attempt=%s url=%s error=%s", attempt, url, exc)
             time.sleep(sleep * attempt)
-        except Exception as exc:  # pragma: no cover - network-dependent
+        except Exception as exc:  # pragma: no cover - зависит от сети
             last_error = exc
             LOGGER.warning("request failed: attempt=%s url=%s error=%s", attempt, url, exc)
             time.sleep(sleep * attempt)
@@ -920,9 +889,7 @@ def discover_e_disclosure_reports(
     end_ts = pd.to_datetime(end) if end else None
     rows: list[dict[str, Any]] = []
     for doc_type in document_types:
-        html = _request_text(E_DISCLOSURE_FILES_URL, params={"id": str(e_disclosure_id), "type": str(doc_type)})  # pragma: no cover - network-dependent
-        # Row-level parsing without a heavy HTML dependency. It extracts links to
-        # FileLoad.ashx and then keeps nearby row text for dates/period inference.
+        html = _request_text(E_DISCLOSURE_FILES_URL, params={"id": str(e_disclosure_id), "type": str(doc_type)})  # pragma: no cover - зависит от сети
         for match in re.finditer(r"(?is)<tr[^>]*>(.*?)</tr>", html):
             row_html = match.group(1)
             if "FileLoad.ashx" not in row_html and "fileload.ashx" not in row_html.lower():
@@ -988,7 +955,7 @@ def discover_reports_for_sources(
                     discovered["discovery_status"] = "ok"
                     discovered["discovery_error"] = None
                     frames.append(discovered)
-            except Exception as exc:  # pragma: no cover - network-dependent
+            except Exception as exc:  # pragma: no cover - зависит от сети
                 LOGGER.warning("E-disclosure discovery failed for %s id=%s: %s", row["ticker"], ed_id, exc)
                 frames.append(
                     pd.DataFrame(
@@ -1012,8 +979,6 @@ def discover_reports_for_sources(
                         ]
                     )
                 )
-        # Direct issuer URL is retained as a source pointer even if the crawler
-        # cannot safely enumerate all PDF links.
         issuer_url = row.get("issuer_url")
         if pd.notna(issuer_url) and str(issuer_url).strip():
             frames.append(
@@ -1089,7 +1054,7 @@ def download_report_registry(
         date_part = "unknown"
         if pd.notna(row.get("report_period_end")):
             date_part = pd.to_datetime(row["report_period_end"]).strftime("%Y%m%d")
-        try:  # pragma: no cover - network-dependent
+        try:  # pragma: no cover - зависит от сети
             response = requests.get(str(url), headers=headers, timeout=60)
             response.raise_for_status()
             content_type = response.headers.get("Content-Type")
@@ -1117,7 +1082,7 @@ def download_report_registry(
             content_types.append(content_type)
             detected_extensions.append(detected_ext)
             time.sleep(sleep)
-        except Exception as exc:  # pragma: no cover - network-dependent
+        except Exception as exc:  # pragma: no cover - зависит от сети
             LOGGER.warning("Download failed for %s: %s", url, exc)
             statuses.append(f"failed:{exc}")
             local_paths.append(row.get("local_path"))

@@ -143,9 +143,6 @@ def run_report_layer_ablation(
     report_features = build_financial_report_features(registry, include_evidence=False)
     report_panel = merge_financial_report_features_pit(base_panel, report_features)
 
-    # Controlled synthetic experiment: accounting/narrative warnings add an
-    # unobserved risk component to future outcomes. The baseline gets the same
-    # targets but cannot see the report-derived signal; the enhanced run can.
     stress = (
         pd.to_numeric(report_panel.get("report_financial_pressure"), errors="coerce").fillna(0.0)
         + 0.10 * pd.to_numeric(report_panel.get("report_sanctions_flag"), errors="coerce").fillna(0.0)
@@ -182,8 +179,6 @@ def run_report_layer_ablation(
             ensemble_weight_step=max(cfg.model.ensemble_weight_step, 0.25),
             n_jobs=1,
         ),
-        # The ablation is a quick controlled experiment, not the production
-        # validation protocol. The full pipeline still uses walk-forward checks.
         walk_forward=replace(cfg.walk_forward, initial_months=120, validation_months=3, test_months=3, step_months=3),
         diagnostics=replace(cfg.diagnostics, save_model_package=False),
     )

@@ -115,6 +115,5 @@ def make_synthetic_monthly_panel(n_tickers: int = 54, random_state: int = 42) ->
                 }
             )
     df = pd.DataFrame(rows)
-    # Drop a reproducible fraction to mimic unavailable targets and readiness flags.
     keep = rng.random(len(df)) > 0.08
     return df.loc[keep].sort_values(["decision_date", "ticker"]).reset_index(drop=True)

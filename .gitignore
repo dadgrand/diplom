@@ -16,6 +16,14 @@ env/
 # Notebooks runtime artifacts
 .ipynb_checkpoints/
 
+# Local build/export artifacts
+build/
+clean_upload/
+docs/rendered_thesis/page-*.png
+docs/rendered_thesis_architected/page-*.png
+diplom_data.zip
+ВКР Поддуба Илья ПМ22-2/
+
 # OS/editor noise
 .DS_Store
 Thumbs.db

@@ -13,8 +13,8 @@ pytest>=8.0
 pypdf>=4.0
 openpyxl>=3.1
 
-# Optional neural backend. Without torch the autoencoder branch falls back to PCA.
-# torch>=2.1
+# нейросетевой backend для mlp-кандидата и autoencoder factors.
+torch>=2.7
 
-# Optional dynamic crawler for JS-heavy issuer pages.
+# опциональный crawler для js-тяжелых страниц эмитентов.
 # crawl4ai>=0.8.6

@@ -33,8 +33,6 @@ def add_domain_derived_features(df: pd.DataFrame) -> pd.DataFrame:
     """
     data = df.copy()
     forbidden = TARGET_COLUMNS.intersection(data.columns)
-    # Target columns may be present in a model-ready table. They are never read in
-    # this function; the variable is kept to make static checks easier.
     _ = forbidden
 
     rolling_vol = _num(data, "rolling_vol_20d", 0.0).clip(lower=0)

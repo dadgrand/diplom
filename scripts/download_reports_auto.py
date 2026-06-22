@@ -187,8 +187,6 @@ def extract_links(page_url: str, content: bytes) -> list[tuple[str, str]]:
             text = normalize_text(" ".join([node.get("title") or "", node.get("aria-label") or "", " ".join(node.itertext())]))
             if href:
                 links.append((href, text))
-    # Many issuer pages keep report links in inline JSON/JS rather than anchors.
-    # Keep nearby stripped text as evidence for scoring and period inference.
     raw_url_re = r"https?://[^\s\"'<>]+?\.(?:pdf|xlsx|xlsm|zip|xls|docx?)(?:\?[^\s\"'<>]*)?"
     for match in re.finditer(raw_url_re, raw_for_urls, flags=re.IGNORECASE):
         url = match.group(0).replace("\\/", "/")

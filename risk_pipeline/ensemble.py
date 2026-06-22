@@ -14,9 +14,8 @@ from .preprocessing import FinancialPreprocessor
 
 EPS = 1e-12
 
-
 def align_proba(model_classes: list[str] | np.ndarray, proba: np.ndarray, target_classes: list[str] = CLASSES) -> np.ndarray:
-    """Align a model's probability columns to the canonical class order."""
+    """Align probability columns to low/medium/high."""
     model_classes = [str(c) for c in model_classes]
     out = np.zeros((proba.shape[0], len(target_classes)), dtype=float)
     for j, cls in enumerate(target_classes):
@@ -32,11 +31,7 @@ def align_proba(model_classes: list[str] | np.ndarray, proba: np.ndarray, target
 
 @dataclass
 class PowerProbabilityCalibrator:
-    """Small train-free multiclass probability calibrator fitted on validation.
-
-    It applies p -> p**gamma and renormalizes. gamma < 1 softens overconfident
-    probabilities; gamma > 1 sharpens underconfident probabilities.
-    """
+    """Small validation-only probability calibrator."""
 
     classes: list[str] = field(default_factory=lambda: CLASSES.copy())
     gamma_grid: list[float] = field(default_factory=lambda: [0.65, 0.80, 1.00, 1.25, 1.50, 1.80])
@@ -70,12 +65,14 @@ class PowerProbabilityCalibrator:
 
 @dataclass
 class WeightedProbabilityEnsemble:
-    """Validation-optimized soft-voting ensemble."""
+    """Soft voting with weights chosen on validation."""
 
     classes: list[str] = field(default_factory=lambda: CLASSES.copy())
     weight_step: float = 0.10
+    high_recall_bonus: float = 0.0
     weights_: dict[str, float] = field(default_factory=dict)
     validation_score_: float | None = None
+    validation_objective_: float | None = None
 
     def _weight_grid(self, names: list[str]) -> list[np.ndarray]:
         n = len(names)
@@ -83,12 +80,10 @@ class WeightedProbabilityEnsemble:
             return [np.ones(1)]
         grid = np.arange(0, 1 + self.weight_step / 2, self.weight_step)
         candidates: list[np.ndarray] = []
-        # Simplex grid. With 3 candidates and step=0.1 this is only 66 points.
         for weights in product(grid, repeat=n):
             w = np.asarray(weights, dtype=float)
             if np.isclose(w.sum(), 1.0):
                 candidates.append(w)
-        # Ensure single-best candidates are always present even with unusual steps.
         for i in range(n):
             w = np.zeros(n); w[i] = 1.0; candidates.append(w)
         return candidates
@@ -98,15 +93,18 @@ class WeightedProbabilityEnsemble:
         if not names:
             raise ValueError("No candidate probabilities supplied")
         y_true = np.asarray(y_true).astype(str)
-        best = (-np.inf, np.ones(len(names)) / len(names))
+        best = (-np.inf, -np.inf, np.ones(len(names)) / len(names))
         for w in self._weight_grid(names):
             p = sum(w[i] * proba_by_name[names[i]] for i in range(len(names)))
             pred = np.array([self.classes[i] for i in np.argmax(p, axis=1)], dtype=object)
             score = f1_score(y_true, pred, labels=self.classes, average="macro", zero_division=0)
-            if score > best[0]:
-                best = (float(score), w.copy())
-        self.validation_score_ = best[0]
-        self.weights_ = {name: float(best[1][i]) for i, name in enumerate(names)}
+            high_recall = ((pred == "high") & (y_true == "high")).sum() / max((y_true == "high").sum(), 1)
+            objective = score + self.high_recall_bonus * high_recall
+            if objective > best[0]:
+                best = (float(objective), float(score), w.copy())
+        self.validation_objective_ = best[0]
+        self.validation_score_ = best[1]
+        self.weights_ = {name: float(best[2][i]) for i, name in enumerate(names)}
         return self
 
     def predict_proba(self, proba_by_name: dict[str, np.ndarray]) -> np.ndarray:
@@ -124,7 +122,7 @@ class WeightedProbabilityEnsemble:
 
 @dataclass
 class CandidateBundle:
-    """Fitted preprocessor, candidate models, validation ensemble and policy."""
+    """Everything needed to score one architecture."""
 
     name: str
     features: list[str]
@@ -207,7 +205,6 @@ def fit_candidate_bundle(
     calibration_grid: list[float],
     high_recall_bonus: float,
 ) -> CandidateBundle:
-    """Fit candidate models, optimize soft-voting weights, calibrate and tune policy."""
     numeric = [c for c in features if c not in categorical]
     cat = [c for c in categorical if c in features]
     pre = FinancialPreprocessor(numeric_features=numeric, categorical_features=cat)
@@ -234,9 +231,18 @@ def fit_candidate_bundle(
         proba = align_proba(model.classes_, model.predict_proba(x_val), CLASSES)
         val_probas[candidate] = proba
         pred = np.array([CLASSES[j] for j in np.argmax(proba, axis=1)], dtype=object)
-        rows.append({"candidate": candidate, "validation_macro_f1_argmax": float(f1_score(y_val, pred, labels=CLASSES, average="macro", zero_division=0))})
+        macro = float(f1_score(y_val, pred, labels=CLASSES, average="macro", zero_division=0))
+        high_recall = float(((pred == "high") & (y_val.to_numpy() == "high")).sum() / max((y_val.to_numpy() == "high").sum(), 1))
+        rows.append(
+            {
+                "candidate": candidate,
+                "validation_macro_f1_argmax": macro,
+                "validation_high_recall_argmax": high_recall,
+                "validation_selection_objective": macro + high_recall_bonus * high_recall,
+            }
+        )
 
-    ensemble = WeightedProbabilityEnsemble(classes=CLASSES, weight_step=ensemble_weight_step).fit(y_val, val_probas)
+    ensemble = WeightedProbabilityEnsemble(classes=CLASSES, weight_step=ensemble_weight_step, high_recall_bonus=0.0).fit(y_val, val_probas)
     ensemble_val = ensemble.predict_proba(val_probas)
     calibrator = PowerProbabilityCalibrator(classes=CLASSES, gamma_grid=calibration_grid).fit(y_val, ensemble_val)
     calibrated_val = calibrator.transform(ensemble_val)
@@ -244,13 +250,22 @@ def fit_candidate_bundle(
     pred_policy = policy.predict_from_proba(calibrated_val)
 
     leaderboard = pd.DataFrame(rows)
+    ensemble_argmax_pred = np.array([CLASSES[j] for j in np.argmax(ensemble_val, axis=1)], dtype=object)
+    ensemble_macro = float(f1_score(y_val, ensemble_argmax_pred, labels=CLASSES, average="macro", zero_division=0))
+    ensemble_high_recall = float(((ensemble_argmax_pred == "high") & (y_val.to_numpy() == "high")).sum() / max((y_val.to_numpy() == "high").sum(), 1))
     leaderboard.loc[len(leaderboard)] = {
         "candidate": "weighted_ensemble_argmax",
-        "validation_macro_f1_argmax": float(ensemble.validation_score_ or 0.0),
+        "validation_macro_f1_argmax": ensemble_macro,
+        "validation_high_recall_argmax": ensemble_high_recall,
+        "validation_selection_objective": float(ensemble.validation_objective_ or 0.0),
     }
+    policy_macro = float(f1_score(y_val, pred_policy, labels=CLASSES, average="macro", zero_division=0))
+    policy_high_recall = float(((pred_policy == "high") & (y_val.to_numpy() == "high")).sum() / max((y_val.to_numpy() == "high").sum(), 1))
     leaderboard.loc[len(leaderboard)] = {
         "candidate": "weighted_ensemble_calibrated_policy",
-        "validation_macro_f1_argmax": float(f1_score(y_val, pred_policy, labels=CLASSES, average="macro", zero_division=0)),
+        "validation_macro_f1_argmax": policy_macro,
+        "validation_high_recall_argmax": policy_high_recall,
+        "validation_selection_objective": policy_macro + high_recall_bonus * policy_high_recall,
     }
     fi = _aggregate_feature_importance(fitted_models, pre, ensemble.weights_)
     return CandidateBundle(

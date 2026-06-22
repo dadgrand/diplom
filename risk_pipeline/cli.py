@@ -18,8 +18,6 @@ from .report_ablation import run_report_layer_ablation
 
 def run_demo(args: argparse.Namespace) -> None:
     cfg = load_config(args.config)
-    # The demo is intentionally lighter than the full configuration so it runs
-    # quickly on a laptop while keeping the same architecture.
     cfg = replace(cfg, model=replace(cfg.model, n_estimators=args.n_estimators, autoencoder_epochs=args.autoencoder_epochs, n_jobs=1))
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)

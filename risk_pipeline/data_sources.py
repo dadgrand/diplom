@@ -28,7 +28,7 @@ def _request_json(url: str, params: dict[str, Any] | None = None, retries: int =
             response = requests.get(url, params=params, timeout=30)
             response.raise_for_status()
             return response.json()
-        except Exception as exc:  # pragma: no cover - network-dependent
+        except Exception as exc:  # pragma: no cover - зависит от сети
             last_error = exc
             LOGGER.warning("request failed: attempt=%s url=%s error=%s", attempt, url, exc)
             time.sleep(sleep * attempt)
@@ -59,7 +59,7 @@ def fetch_moex_history(
     """
     rows: list[pd.DataFrame] = []
     offset = 0
-    while True:  # pragma: no cover - network-dependent
+    while True:  # pragma: no cover - зависит от сети
         url = f"{MOEX_BASE_URL}/history/engines/{engine}/markets/{market}/boards/{board}/securities/{ticker}.json"
         params = {
             "from": start,
@@ -109,7 +109,7 @@ def fetch_moex_universe(board: str = "TQBR", engine: str = "stock", market: str 
     low-liquidity share classes and too-short histories.
     """
     url = f"{MOEX_BASE_URL}/engines/{engine}/markets/{market}/boards/{board}/securities.json"
-    payload = _request_json(url, params={"iss.meta": "off"})  # pragma: no cover - network-dependent
+    payload = _request_json(url, params={"iss.meta": "off"})  # pragma: no cover - зависит от сети
     securities = _moex_table_to_frame(payload, "securities")
     if securities.empty:
         return securities
@@ -126,7 +126,7 @@ def fetch_cbr_fx_xml(day: str | date | datetime, char_code: str = "USD") -> floa
     else:
         dt = day
     params = {"date_req": dt.strftime("%d/%m/%Y")}
-    response = requests.get(CBR_DAILY_XML_URL, params=params, timeout=30)  # pragma: no cover - network-dependent
+    response = requests.get(CBR_DAILY_XML_URL, params=params, timeout=30)  # pragma: no cover - зависит от сети
     response.raise_for_status()
     root = ET.fromstring(response.content)
     for valute in root.findall("Valute"):

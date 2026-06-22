@@ -190,8 +190,6 @@ def fetch_cbr_key_rate(start: str, end: str) -> pd.DataFrame:
 
 
 def _zcyc_for_date(day: pd.Timestamp) -> float | None:
-    # The CBR table contains dashes for weekends and some holidays. Try nearby
-    # previous dates so the curve remains point-in-time.
     for shift in range(0, 8):
         candidate = day - pd.Timedelta(days=shift)
         url = f"{CBR_ZCYC_URL}?DateTo={candidate.strftime('%d.%m.%Y')}"

@@ -11,7 +11,7 @@
 2. Цель строится по будущему окну риска, но признаки формируются строго
    point-in-time: рыночные данные, макроэкономика, фундаментальные показатели и
    только уже опубликованная финансовая отчетность.
-3. Финансовая отчетность не используется как произвольный LLM-вывод. Она
+3. Финансовая отчетность не используется как произвольный текстовый вывод. Она
    преобразуется в воспроизводимые числовые признаки: долговая нагрузка,
    cash-flow pressure, покрытие процентов, признаки санкционного/валютного,
    ковенантного и ликвидностного риска.
@@ -92,16 +92,16 @@ Report-layer validation gate:
 
 ## Что показывать из проекта
 
-- `results/defense_run/DEFENSE_MATERIALS.md` - основной отчет для защиты.
-- `results/defense_run/defense_assets/report_layer_ablation.png` - доказательство
+- `results/defense_run_architected/DEFENSE_MATERIALS.md` - основной отчет для защиты.
+- `results/defense_run_architected/defense_assets/report_layer_ablation.png` - доказательство
   пользы финотчетности.
-- `results/defense_run/defense_assets/architecture_test_metrics.png` - сравнение
+- `results/defense_run_architected/defense_assets/architecture_test_metrics.png` - сравнение
   архитектур.
-- `results/defense_run/defense_assets/confusion_matrix_final.png` - ошибки
+- `results/defense_run_architected/defense_assets/confusion_matrix_final.png` - ошибки
   классификации.
-- `results/defense_run/defense_assets/feature_importance_top20.png` -
+- `results/defense_run_architected/defense_assets/feature_importance_top20.png` -
   интерпретация.
-- `results/defense_run/defense_assets/drift_top20_psi.png` - честная диагностика
+- `results/defense_run_architected/defense_assets/drift_top20_psi.png` - честная диагностика
   сдвига рынка.
 
 ## Вопросы, которые могут задать

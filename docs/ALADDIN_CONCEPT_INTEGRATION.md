@@ -4,7 +4,7 @@ The diploma pipeline now integrates the strongest engineering ideas from the RU 
 
 ## Ideas kept
 
-1. **Deterministic model core.** All numbers are produced by Python code and saved as artifacts. No LLM is allowed to invent metrics.
+1. **Deterministic model core.** All numbers are produced by Python code and saved as artifacts.
 2. **Source separation.** Market, macro, fundamentals and reports are separate layers that can be tested independently.
 3. **Scenario mindset.** Report text is converted into explicit risk dimensions: liquidity, refinancing, sanctions, FX, capex, litigation and auditor warnings.
 4. **Validation discipline.** Report features are not accepted automatically. The pipeline compares with-report and without-report architectures on chronological validation.
@@ -14,7 +14,7 @@ The diploma pipeline now integrates the strongest engineering ideas from the RU 
 ## Ideas intentionally not copied as production dependencies
 
 - Portfolio trading automation.
-- LLM-driven numeric extraction without evidence.
+- Numeric extraction without evidence.
 - Investment recommendations.
 - Unverified scraping assumptions that could break silently.
 

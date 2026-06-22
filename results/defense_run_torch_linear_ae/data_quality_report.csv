@@ -1,0 +1,4 @@
+check,keys,passed,duplicates,non_null_rates,min_date,max_date
+no_duplicate_keys,"['decision_date', 'ticker']",True,0.0,,,
+target_components_available,,True,,"{'future_max_drawdown': 0.9420600858369099, 'future_downside_volatility': 0.9420600858369099, 'future_cvar_95': 0.9420600858369099, 'future_illiquidity': 0.9420600858369099}",,
+date_parse,,True,,,2022-01-31 00:00:00,2026-05-12 00:00:00

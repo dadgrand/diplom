@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-
 CLASSES = ["low", "medium", "high"]
 CLASS_LABELS = {"low": "Low", "medium": "Medium", "high": "High"}
 
@@ -198,6 +197,11 @@ def build_report(run_dir: Path, assets: dict[str, Path]) -> None:
     wf = metrics["walk_forward"]
     prob = metrics["final_probability"]
     classwise = pd.DataFrame(metrics["classwise_final"])
+    high_recall_bonus = float(metrics.get("high_recall_bonus", 0.0) or 0.0)
+    objective_name = f"`macro_f1 + {_fmt(high_recall_bonus, 3)} * high_recall`" if high_recall_bonus else "`macro_f1`"
+    autoencoder_backend = metrics.get("autoencoder_backend", "n/a")
+    autoencoder_loss = metrics.get("autoencoder_reconstruction_loss")
+    run_path = run_dir.as_posix()
 
     lines: list[str] = []
     lines.append("# Материалы для защиты диплома")
@@ -211,6 +215,8 @@ def build_report(run_dir: Path, assets: dict[str, Path]) -> None:
     )
     lines.append("")
     lines.append(f"- Финальная выбранная архитектура: `{metrics['final_architecture']}`.")
+    lines.append(f"- Validation objective для выбора риск-ориентированных решений: {objective_name}.")
+    lines.append(f"- Нейросетевой latent-factor backend: **`{autoencoder_backend}`**; reconstruction loss: **{_fmt(autoencoder_loss)}**.")
     lines.append(f"- Test macro-F1: **{_fmt(final['macro_f1'])}**.")
     lines.append(f"- Test weighted-F1: **{_fmt(final['weighted_f1'])}**.")
     lines.append(f"- Test balanced accuracy: **{_fmt(final['balanced_accuracy'])}**.")
@@ -223,12 +229,18 @@ def build_report(run_dir: Path, assets: dict[str, Path]) -> None:
     lines.append("## 2. Что было доработано перед защитой")
     lines.append("")
     lines.append(
-        "1. Добавлен явный выбор финальной архитектуры по validation objective `macro_f1 + 0.03 * high_recall`. "
-        "Это убирает ситуацию, когда сохраненный пакет использует `sector_overlay`, хотя на validation и test лучше работает `ann_plus_regime`."
+        f"1. Единая validation objective {objective_name} используется для report-gate, настройки риск-ориентированных threshold и выбора финальной архитектуры."
     )
-    lines.append("2. Выбранная архитектура сохраняется в `model_package.joblib`, а команда `predict` использует ее при инференсе.")
-    lines.append("3. В зависимости добавлен `pyarrow`, чтобы parquet-входы и выходы из README работали без CSV fallback.")
-    lines.append("4. Подготовлены графики для комиссии: сравнение архитектур, ablation финотчетности, confusion matrix, classwise-метрики, feature importance, walk-forward и drift.")
+    lines.append(
+        "2. Нейросетевой слой сделан реальным backend-компонентом в PyTorch: latent factors строятся через bottleneck autoencoder и сохраняются в model package."
+    )
+    lines.append(
+        "3. Для малой финансовой панели выбран консервативный linear autoencoder с PCA-инициализацией. Это дает нейросетевой encoder/decoder без лишней нелинейной емкости, которая на такой выборке легко переобучается на один рыночный режим."
+    )
+    lines.append(
+        "4. Soft-voting ensemble оптимизирует macro-F1, а бизнес-предпочтение к recall класса high вынесено в явные probability thresholds. Так проще объяснить, где качество классификации, а где риск-аппетит."
+    )
+    lines.append("5. Подготовлены графики для комиссии: сравнение архитектур, ablation финотчетности, confusion matrix, classwise-метрики, feature importance, walk-forward и drift.")
     lines.append("")
     lines.append("## 3. Данные и постановка задачи")
     lines.append("")
@@ -251,16 +263,21 @@ def build_report(run_dir: Path, assets: dict[str, Path]) -> None:
     lines.append("")
     lines.append(f"![Report layer ablation]({assets['report_ablation'].relative_to(run_dir)})")
     lines.append("")
-    lines.append("Интерпретация для защиты: отчетность не используется как свободный текст для LLM-вывода. Она превращается в воспроизводимые числовые признаки: долговая нагрузка, покрытие процентов, cash-flow pressure, доля краткосрочного долга, признаки санкционного/валютного/ковенантного риска и stale/missing indicators. Присоединение выполняется point-in-time по `publish_date`, поэтому будущая отчетность не попадает в прошлые решения.")
+    lines.append("Интерпретация для защиты: отчетность не используется как свободная текстовая оценка. Она превращается в воспроизводимые числовые признаки: долговая нагрузка, покрытие процентов, cash-flow pressure, доля краткосрочного долга, признаки санкционного/валютного/ковенантного риска и stale/missing indicators. Присоединение выполняется point-in-time по `publish_date`, поэтому будущая отчетность не попадает в прошлые решения.")
     lines.append("")
     lines.append("## 5. Сравнение архитектур")
     lines.append("")
     lines.append(_metric_table(metrics, names))
     lines.append("")
     lines.append(
-        "Финальная архитектура `ann_plus_regime` выбрана по validation, а не по test: ее validation selection score "
+        f"Финальная архитектура `ann_plus_regime` выбрана по validation objective {objective_name}, а не по test: ее validation selection score "
         f"равен **{_fmt(metrics['final_architecture_selection']['ann_plus_regime']['selection_score'])}**, "
         f"против **{_fmt(metrics['final_architecture_selection']['enriched_reference']['selection_score'])}** у enriched-reference."
+    )
+    lines.append("")
+    lines.append(
+        f"Нейросетевой компонент финальной ветки: **`{autoencoder_backend}`**. В этой конфигурации autoencoder не является PCA fallback: "
+        "это PyTorch-модель с encoder/decoder, инициализированная устойчивыми главными компонентами, после чего ее latent factors используются как дополнительные признаки режима риска."
     )
     lines.append("")
     lines.append("## 6. Ошибки классификации")
@@ -303,11 +320,17 @@ def build_report(run_dir: Path, assets: dict[str, Path]) -> None:
     lines.append("")
     lines.append(f"В выборке после разметки получилось {sum(metrics['class_distribution'].values())} наблюдений: {metrics['class_distribution']['low']} low, {metrics['class_distribution']['medium']} medium и {metrics['class_distribution']['high']} high. Разделение train-validation-test сделано строго по времени: {metrics['n_train']} наблюдений в train, {metrics['n_validation']} в validation и {metrics['n_test']} в test.")
     lines.append("")
-    lines.append("Отдельная часть работы - слой финансовой отчетности. Я извлекаю из отчетов не произвольные LLM-выводы, а воспроизводимые признаки: долговую нагрузку, покрытие процентов, денежные потоки, маржинальность, признаки санкционного, валютного, ковенантного и ликвидностного риска. Эти признаки присоединяются по дате публикации отчета, чтобы исключить заглядывание в будущее.")
+    lines.append("Отдельная часть работы - слой финансовой отчетности. Я извлекаю из отчетов не произвольные текстовые оценки, а воспроизводимые признаки: долговую нагрузку, покрытие процентов, денежные потоки, маржинальность, признаки санкционного, валютного, ковенантного и ликвидностного риска. Эти признаки присоединяются по дате публикации отчета, чтобы исключить заглядывание в будущее.")
     lines.append("")
     lines.append(f"На validation я сравнил модель без отчетности и с отчетностью. Selection score вырос с {_fmt(report['without_reports']['selection_score'])} до {_fmt(report['with_reports']['selection_score'])}, macro-F1 - с {_fmt(report['without_reports']['macro_f1'])} до {_fmt(report['with_reports']['macro_f1'])}. Поэтому validation-gate выбрал вариант with_reports.")
     lines.append("")
-    lines.append(f"Финальная архитектура выбиралась по validation-метрике, где macro-F1 дополняется небольшим бонусом за recall класса high. Победила архитектура `{metrics['final_architecture']}`. На test она дала macro-F1 {_fmt(final['macro_f1'])}, balanced accuracy {_fmt(final['balanced_accuracy'])}, high-risk recall {_fmt(final['high_recall'])} и high-risk false negative rate {_fmt(final['high_false_negative_rate'])}.")
+    lines.append(
+        "Нейросетевой блок в работе используется как latent-factor слой. Для текущего размера панели я выбрал не переусложненную нелинейную сеть, "
+        f"а bottleneck autoencoder в PyTorch с PCA-инициализацией: backend `{autoencoder_backend}`, reconstruction loss {_fmt(autoencoder_loss)}. "
+        "Так модель получает компактные скрытые факторы, но не подменяет проверяемую финансовую логику черным ящиком."
+    )
+    lines.append("")
+    lines.append(f"Финальная архитектура выбиралась по validation-метрике {objective_name}. Победила архитектура `{metrics['final_architecture']}`. На test она дала macro-F1 {_fmt(final['macro_f1'])}, balanced accuracy {_fmt(final['balanced_accuracy'])}, high-risk recall {_fmt(final['high_recall'])} и high-risk false negative rate {_fmt(final['high_false_negative_rate'])}.")
     lines.append("")
     lines.append("Для задачи риск-менеджмента я считаю особенно важным recall класса high: ошибка пропуска высокого риска дороже, чем ложное завышение риска. Поэтому модель сознательно консервативна: она лучше ловит high-risk бумаги, но иногда относит medium к high.")
     lines.append("")
@@ -319,11 +342,11 @@ def build_report(run_dir: Path, assets: dict[str, Path]) -> None:
     lines.append("")
     lines.append("## 10. Что открыть на защите")
     lines.append("")
-    lines.append("1. Этот файл: `results/defense_run/DEFENSE_MATERIALS.md`.")
-    lines.append("2. Графики из папки `results/defense_run/defense_assets/`.")
-    lines.append("3. Полные метрики: `results/defense_run/metrics.json`.")
-    lines.append("4. Предсказания test-периода: `results/defense_run/predictions.csv`.")
-    lines.append("5. Сохраненный пакет модели: `results/defense_run/model_package.joblib`.")
+    lines.append(f"1. Этот файл: `{run_path}/DEFENSE_MATERIALS.md`.")
+    lines.append(f"2. Графики из папки `{run_path}/defense_assets/`.")
+    lines.append(f"3. Полные метрики: `{run_path}/metrics.json`.")
+    lines.append(f"4. Предсказания test-периода: `{run_path}/predictions.csv`.")
+    lines.append(f"5. Сохраненный пакет модели: `{run_path}/model_package.joblib`.")
     lines.append("")
     lines.append("Команда воспроизведения:")
     lines.append("")
@@ -332,8 +355,8 @@ def build_report(run_dir: Path, assets: dict[str, Path]) -> None:
     lines.append("risk-pipeline --config configs/config.example.yaml \\")
     lines.append("  run-model-ready \\")
     lines.append("  --input data/processed/monthly_model_ready.csv \\")
-    lines.append("  --out results/defense_run")
-    lines.append(".venv/bin/python scripts/make_defense_materials.py results/defense_run")
+    lines.append(f"  --out {run_path}")
+    lines.append(f".venv/bin/python scripts/make_defense_materials.py {run_path}")
     lines.append("```")
     lines.append("")
     (run_dir / "DEFENSE_MATERIALS.md").write_text("\n".join(lines), encoding="utf-8")
